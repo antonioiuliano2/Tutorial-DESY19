@@ -12,7 +12,8 @@ nevents = simtree.GetEntries()
 scansetfile = r.TFile.Open(sys.argv[2])
 scanset = scansetfile.Get("set")
 
-outputfile = open("mysim.txt","w")
+txtfilename = "BRICK.TreePGunInfo.txt"
+outputfile = open(txtfilename,"w")
 
 #get positions of a plate in FairSHIP an FEDRA references to set z offset
 simtree.GetEntry(0)
@@ -81,8 +82,8 @@ for ievent, event in enumerate(simtree):
 
 outputfile.close()
 
-
-print ("Producing tree, start testing if it is readable")
-testtree = r.TTree("testree","Test reading tree as ShowRec will do")
-testtree.ReadFile("mysim.txt","MCEvt/I:energy/F:tantheta/F:dirx/F:diry/F:dirz/F:vtxposx/F:vtxposy/F:vtxposz/F:TX/F:TY/F:X/F:Y/F:Z/F:PDGId/I")
-testtree.Print()
+print ("Produced tree")
+#print ("Producing tree, start testing if it is readable")
+#testtree = r.TTree("mysim","Test reading tree as ShowRec will do")
+#testtree.ReadFile(textfilename,"MCEvt/I:energy/F:tantheta/F:dirx/F:diry/F:dirz/F:vtxposx/F:vtxposy/F:vtxposz/F:TX/F:TY/F:X/F:Y/F:Z/F:PDGId/I")
+#testtree.Print()
