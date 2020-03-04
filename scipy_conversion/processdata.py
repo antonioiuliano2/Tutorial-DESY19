@@ -61,17 +61,38 @@ def getshowernr(mcevent):
 
  return inputtree.GetEntryNumberWithIndex(mcevent)
 
-def displayshowers(nevent,nshower):
+def displayshowers(nshower,nevents = 300):
  '''compare display of segments from MCEvent nevent
     with reconstructed segments from nshower
  '''
- dfevent = df.query("MCEvent=={}".format(nevent))
- dfevent = dfevent.reset_index() #resetting the index, allows indexing from 0
-
  #getting containers of found couples from tree
  inputtree.GetEntry(nshower)
  idfoundlist= inputtree.idb
+ xbfoundlist = inputtree.xb
+ ybfoundlist = inputtree.yb
+ zbfoundlist = inputtree.zb
  platebfoundlist = inputtree.plateb
+ mceventlist = inputtree.ntrace1simub
+
+ nsegmentsxevent = {}
+ #initializing to zero
+ for i in range(nevents):
+  nsegmentsxevent[i] = 0
+ #finding most common event
+ for event in mceventlist:
+  nsegmentsxevent[event] = nsegmentsxevent[event] + 1
+
+ maxsegments = 0
+ mostcommnevent = -1
+ for i in range(nevents):
+  if nsegmentsxevent[i] > maxsegments:
+   maxsegments = nsegmentsxevent[i]
+   mostcommonevent = i
+
+ dfevent = df.query("MCEvent=={}".format(mostcommonevent))
+ dfevent = dfevent.reset_index() #resetting the index, allows indexing from 0
+
+ print("Display shower for event{}".format(mostcommonevent))
 
  dfevent["Found"] = False
  #checking if a segment from that event was found, according to ID and PID. Again, unfortunately still done with a loop due to my inexperience
@@ -86,7 +107,7 @@ def displayshowers(nevent,nshower):
  #draw projections, for missing and found segments
  figzy,ax_yz = plt.subplots()
  ax_yz.plot(dfevent_onlymissing['z'], dfevent_onlymissing['y'],"ro",fillstyle="none",label="missing segments")
- ax_yz.plot(dfevent_onlyfound['z'], dfevent_onlyfound['y'],"bo",fillstyle="none",label="found segments")
+ ax_yz.plot(zbfoundlist, ybfoundlist,"bo",fillstyle="none",label="found segments")
  plt.title("zy projection")
  plt.xlabel("z[micron]")
  plt.ylabel("y[micron]")
@@ -95,7 +116,7 @@ def displayshowers(nevent,nshower):
 
  figzx,ax = plt.subplots()
  ax.plot(dfevent_onlymissing['z'], dfevent_onlymissing['x'],"ro",fillstyle="none",label="missing segments")
- ax.plot(dfevent_onlyfound['z'], dfevent_onlyfound['x'],"bo",fillstyle="none",label="found segments")
+ ax.plot(zbfoundlist, xbfoundlist,"bo",fillstyle="none",label="found segments")
  plt.title("zx projection")
  plt.xlabel("z[micron]")
  plt.ylabel("x[micron]")
@@ -133,5 +154,5 @@ def displaytrack(ntrack):
  figzx.show()
  ax.add_collection(lcxz)
 
-dfevent = displayshowers(nevent, getshowernr(nevent))
+dfevent = displayshowers(50)
 
