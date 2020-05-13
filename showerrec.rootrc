@@ -1,0 +1,12 @@
+showerrec.nbrick:                        1
+showerrec.cpcut:                         1
+showerrec.trkcut:                        nseg>3 && s[nseg-1].ePID==52
+showerrec.firstsegment:                  1
+showerrec.ConeRadius:                    800
+showerrec.ConeAngle:                     0.1
+showerrec.ConnectionDR:                  150
+showerrec.ConnectionDT:                  0.15
+showerrec.NPropagation:                  3
+showerrec.outdir:                        ..
+showerrec.env:                           showerrec.rootrc
+showerrec.EdbDebugLevel:                 1
