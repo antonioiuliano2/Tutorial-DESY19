@@ -1,11 +1,12 @@
-//draw couples
+//script to collect couples from all plate files with a required condition. If needed, they can also be drawn with FEDRA display ("uploaded on 22 May 2020, A.Iuliano")
 void drawcouples(){
- bool dodraw=false;
- TString condition = TString("s.eMCEvt>=0"); //which segments to select
- const int ibrick = 5;
- TString runpath = TString(Form("/ship/DESY2019/RUN%i_sim/b00000%i/",ibrick,ibrick));
+ bool dodraw=true;
+ TString condition = TString("s.eMCEvt==100"); //which segments to select
+ const int ibrick = 1; //brick code
+ const int nplates = 57; //number of plates for brick
+ TString runpath = TString(Form("../RUN%i_sim/b00000%i/",ibrick,ibrick));
 
- const int nplates = 29;
+
 
  EdbVertexRec *gEVR = new EdbVertexRec();
  EdbCouplesTree *ect[nplates];
@@ -25,9 +26,8 @@ void drawcouples(){
  //Defining histograms
  TH2D *hTXTY = new TH2D("hTXTY","Histogram for angles;TX;TY", 20,-0.05,0.05,20,-0.05,0.05);
  
- //************LOOP OVER PLATES************//
+ //************LOOP OVER PLATES (N.B. from last to first, like tracking)************//
  for (int i = nplates; i >= 1; i--){ 
-  //if(i==27 || i==20 || i== 6 || i==8) continue; // id of excluded plates
   //getting z position and affine transformation
   EdbPlateP* p = set->GetPlate(i);
   float zplate = p->Z();
@@ -58,9 +58,11 @@ void drawcouples(){
    seg->Copy(*(ect[i-1]->eS));
    //setting z and affine transformation
    seg->SetZ(zplate);
-   seg->SetDZ(300);
    seg->Transform(aff);
    
+   //needed to set a reference DZ for display   
+   seg->SetDZ(300); 
+
    //***Analysis of the segment***//
    //getting kinematic variables
    X = seg->X();
@@ -81,8 +83,8 @@ void drawcouples(){
  //DISPLAY OF SEGMENTS
  if(dodraw){
   const char *dsname = "DESY-testbeam-couples";
-  ds = EdbDisplay::EdbDisplayExist(dsname);
-  if(!ds)  ds=new EdbDisplay(dsname,-100000.,100000.,-100000.,100000.,-40000., 0..);
+  EdbDisplay * ds = EdbDisplay::EdbDisplayExist(dsname);
+  if(!ds)  ds=new EdbDisplay(dsname,-100000.,100000.,-100000.,100000.,-80000., 0.);
   ds->SetVerRec(gEVR);
   ds->SetDrawTracks(4);
   ds->SetArrSegP( sarr );
