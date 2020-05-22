@@ -1,11 +1,12 @@
 //script to collect couples from all plate files with a required condition. If needed, they can also be drawn with FEDRA display ("uploaded on 22 May 2020, A.Iuliano")
 void drawcouples(){
- bool dodraw=true;
- TString condition = TString("s.eMCEvt==100"); //which segments to select
+ bool dodraw=false;
+ TString condition = TString("1"); //which segments to select
  const int ibrick = 1; //brick code
  const int nplates = 57; //number of plates for brick
  TString runpath = TString(Form("../RUN%i_sim/b00000%i/",ibrick,ibrick));
 
+ TDatabasePDG *pdgdatabase = TDatabasePDG::Instance();
 
 
  EdbVertexRec *gEVR = new EdbVertexRec();
@@ -22,9 +23,13 @@ void drawcouples(){
  float X, Y, Z; //segment positions
  float TX, TY; //segment angles
  float Prob; //segment probability
+ float P_MC;
+ int pdgcode;
+ float mass;
  
  //Defining histograms
  TH2D *hTXTY = new TH2D("hTXTY","Histogram for angles;TX;TY", 20,-0.05,0.05,20,-0.05,0.05);
+ TH2D *hpvsM = new TH2D("hpvsm","Momentum vs mass;M[GeV/c2];P[GeV/c]",100,0,1,600,0,6);
  
  //************LOOP OVER PLATES (N.B. from last to first, like tracking)************//
  for (int i = nplates; i >= 1; i--){ 
@@ -70,6 +75,14 @@ void drawcouples(){
    Z = seg->Z();
    TX = seg->TX();
    TY = seg->TY();
+   //mc momentum
+   P_MC = seg->P();
+
+   pdgcode = seg->Flag();
+   mass = 0.;
+   if (pdgdatabase->GetParticle(pdgcode)) mass = pdgdatabase->GetParticle(pdgcode)->Mass();
+   hpvsM->Fill(mass,P_MC);
+
    //probability from fit
    Prob = seg->Prob();
    
@@ -90,7 +103,10 @@ void drawcouples(){
   ds->SetArrSegP( sarr );
   ds->Draw();
  }
- 
+ //Draw of hisotgrams
  TCanvas *c = new TCanvas();
  hTXTY->Draw("COLZ");
+ TCanvas *cmass = new TCanvas();
+ hpvsM->Draw("COLZ");
+ 
 }
