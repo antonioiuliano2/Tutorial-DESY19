@@ -25,15 +25,15 @@ def builddataframe(brick, cutstring = "1"):
  IDall = np.zeros(0,dtype=int)
  PIDall = np.zeros(0,dtype=int)
 
- xall = np.zeros(0,dtype=float)
- yall = np.zeros(0,dtype=float)
- zall = np.zeros(0,dtype=float)
- TXall = np.zeros(0,dtype=float)
- TYall = np.zeros(0,dtype=float)
+ xall = np.zeros(0,dtype=np.float32)
+ yall = np.zeros(0,dtype=np.float32)
+ zall = np.zeros(0,dtype=np.float32)
+ TXall = np.zeros(0,dtype=np.float32)
+ TYall = np.zeros(0,dtype=np.float32)
 
  MCEvtall = np.zeros(0,dtype=int)
  MCTrackall = np.zeros(0,dtype=int)
- Pall = np.zeros(0,dtype=float)
+ Pall = np.zeros(0,dtype=np.float32)
  Flagall = np.zeros(0,dtype=int)
 
  for i in range(npl):
@@ -55,15 +55,15 @@ def builddataframe(brick, cutstring = "1"):
   IDarray_plate = np.zeros(nseg,dtype=int)
   PIDarray_plate = np.zeros(nseg,dtype=int)
 
-  xarray_plate = np.zeros(nseg,dtype=float)
-  yarray_plate = np.zeros(nseg,dtype=float)
-  zarray_plate = np.zeros(nseg,dtype=float)
-  TXarray_plate = np.zeros(nseg,dtype=float)
-  TYarray_plate = np.zeros(nseg,dtype=float)
+  xarray_plate = np.zeros(nseg,dtype=np.float32)
+  yarray_plate = np.zeros(nseg,dtype=np.float32)
+  zarray_plate = np.zeros(nseg,dtype=np.float32)
+  TXarray_plate = np.zeros(nseg,dtype=np.float32)
+  TYarray_plate = np.zeros(nseg,dtype=np.float32)
    
   MCEvtarray_plate = np.zeros(nseg,dtype=int)
   MCTrackarray_plate = np.zeros(nseg,dtype=int)
-  Parray_plate = np.zeros(nseg,dtype=float)
+  Parray_plate = np.zeros(nseg,dtype=np.float32)
   Flagarray_plate = np.zeros(nseg,dtype=int)
 
   print ("loop over {} segments for plate {}".format(nseg,nplate))
@@ -123,6 +123,77 @@ def builddataframe(brick, cutstring = "1"):
 
  return df
 
+
+def addtrueMCinfo(df,simfile):
+ '''getting additional true MC info from source file'''
+ import pandas as pd
+ import numpy as np
+ import ROOT as r
+ 
+ simtree = simfile.Get("cbmsim")
+
+ zoffset = 0.
+ #computing zoffset: in our couples, most downstream plate has always z=0
+ simtree.GetEntry(0)
+ emulsionhits = simtree.BoxPoint
+ ihit = 0
+ while (zoffset >= 0.):
+  hit = emulsionhits[ihit]  
+  if (hit.GetDetectorID()==29):
+   zoffset = 0. - (hit.GetZ() *1e+4) #we need also to convert from cm to micron
+  ihit = ihit + 1
+
+ print("ZOffset between FairShip and FEDRA",zoffset) 
+
+ df = df.sort_values(["MCEvent","MCTrack"]) #sorting by MCEventID allows to access each event only once
+ df.reset_index()
+
+ currentevent=-1
+
+ nsegments = len(df)
+ isegment = 0
+ print("dataframe prepared, starting loop over {} segments".format(nsegments))
+
+ #preparing arrays with new columns
+ arr_MotherID = np.zeros(nsegments, dtype=int)
+
+ arr_startZ = np.zeros(nsegments,dtype=float)
+ 
+ arr_startPx = np.zeros(nsegments,dtype=float)
+ arr_startPy = np.zeros(nsegments,dtype=float)
+ arr_startPz = np.zeros(nsegments,dtype=float)
+
+ for (MCEvent, MCTrack) in zip(df['MCEvent'], df['MCTrack']):
+
+  if (MCEvent != currentevent):
+   currentevent = MCEvent
+   simtree.GetEntry(currentevent)
+   eventtracks = simtree.MCTrack
+   if(currentevent%10000 == 0):
+    print("Arrived at event ",currentevent)
+
+  #adding values
+  mytrack = eventtracks[MCTrack]
+  arr_MotherID[isegment] = mytrack.GetMotherId()
+
+  arr_startZ[isegment] = mytrack.GetStartZ()*1e+4 + zoffset
+  
+  arr_startPx[isegment] = mytrack.GetPx()
+  arr_startPy[isegment] = mytrack.GetPy()
+  arr_startPz[isegment] = mytrack.GetPz()
+  
+  isegment = isegment + 1
+ 
+ #adding the new columns to the dataframe
+ df["MotherID"] = arr_MotherID 
+
+ df["StartZ"] = arr_startZ
+
+ df["startPx"] = arr_startPx
+ df["startPy"] = arr_startPy
+ df["startPz"] = arr_startPz
+ 
+ return df
 
 def addtrackindex(df, trackfilename):
  trackfile = r.TFile.Open(trackfilename)
