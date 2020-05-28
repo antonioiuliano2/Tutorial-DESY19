@@ -124,14 +124,17 @@ def builddataframe(brick, cutstring = "1"):
  return df
 
 
-def addtrueMCinfo(df,simfile):
- '''getting additional true MC info from source file'''
+def addtrueMCinfo(df,simfile, ship_charm):
+ '''getting additional true MC info from source file, If ship_charm is true, TM is taken into account to spread XY position'''
  import pandas as pd
  import numpy as np
  import ROOT as r
  
  simtree = simfile.Get("cbmsim")
 
+ #position differences from FairShip2Fedra: initialized to 0
+ xoffset = 0.
+ yoffset = 0.
  zoffset = 0.
  #computing zoffset: in our couples, most downstream plate has always z=0
  simtree.GetEntry(0)
@@ -140,12 +143,16 @@ def addtrueMCinfo(df,simfile):
  while (zoffset >= 0.):
   hit = emulsionhits[ihit]  
   if (hit.GetDetectorID()==29):
-   zoffset = 0. - (hit.GetZ() *1e+4) #we need also to convert from cm to micron
+   zoffset = 0. - hit.GetZ()
   ihit = ihit + 1
+
+ #virtual TM parameters (only ship-charm simulations)
+ spilldy = 1
+ targetmoverspeed = 2.6
 
  print("ZOffset between FairShip and FEDRA",zoffset) 
 
- df = df.sort_values(["MCEvent","MCTrack"]) #sorting by MCEventID allows to access each event only once
+ df = df.sort_values(["MCEvent","MCTrack","PID"],ascending=[True,True,False]) #sorting by MCEventID allows to access each event only once
  df.reset_index()
 
  currentevent=-1
@@ -157,6 +164,8 @@ def addtrueMCinfo(df,simfile):
  #preparing arrays with new columns
  arr_MotherID = np.zeros(nsegments, dtype=int)
 
+ arr_startX = np.zeros(nsegments,dtype=float)
+ arr_startY = np.zeros(nsegments,dtype=float)
  arr_startZ = np.zeros(nsegments,dtype=float)
  
  arr_startPx = np.zeros(nsegments,dtype=float)
@@ -171,12 +180,25 @@ def addtrueMCinfo(df,simfile):
    eventtracks = simtree.MCTrack
    if(currentevent%10000 == 0):
     print("Arrived at event ",currentevent)
+   #getting virtual timestamp and replicating Target Mover
+   if (ship_charm):
+    eventheader = simtree.ShipEventHeader
+    virtualtimestamp = eventheader.GetEventTime()
+    nspill = int(virtualtimestamp/100)
+    pottime = virtualtimestamp - nspill * 100
+    #computing xy offset for this event
+    xoffset = -12.5/2. + pottime * targetmoverspeed
+    yoffset = - 9.9/2. + 0.5 + nspill * spilldy 
+    #print(virtualtimestamp, pottime, nspill, xoffset, yoffset)
+   
 
   #adding values
   mytrack = eventtracks[MCTrack]
   arr_MotherID[isegment] = mytrack.GetMotherId()
 
-  arr_startZ[isegment] = mytrack.GetStartZ()*1e+4 + zoffset
+  arr_startX[isegment] = (mytrack.GetStartX() + xoffset) * 1e+4 + 62500 #we need also to convert cm to micron
+  arr_startY[isegment] = (mytrack.GetStartY() + yoffset) * 1e+4 + 49500
+  arr_startZ[isegment] = (mytrack.GetStartZ() + zoffset) * 1e+4
   
   arr_startPx[isegment] = mytrack.GetPx()
   arr_startPy[isegment] = mytrack.GetPy()
@@ -187,6 +209,8 @@ def addtrueMCinfo(df,simfile):
  #adding the new columns to the dataframe
  df["MotherID"] = arr_MotherID 
 
+ df["StartX"] = arr_startX
+ df["StartY"] = arr_startY
  df["StartZ"] = arr_startZ
 
  df["startPx"] = arr_startPx
