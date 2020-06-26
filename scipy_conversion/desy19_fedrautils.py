@@ -36,6 +36,9 @@ def builddataframe(brick, cutstring = "1"):
  Pall = np.zeros(0,dtype=np.float32)
  Flagall = np.zeros(0,dtype=int)
 
+ print ("Cut on couples ")
+ cut.Print()
+
  for i in range(npl):
   idplate = ss.GetID(i);
       
@@ -49,26 +52,31 @@ def builddataframe(brick, cutstring = "1"):
    ect.InitCouplesTree("couples","p00{}/{}.{}.0.0.cp.root".format(nplate,brick,nplate),"READ")
   else:
    ect.InitCouplesTree("couples","p0{}/{}.{}.0.0.cp.root".format(nplate,brick,nplate),"READ")
+
+  #addingcut
+  ect.eCut = cut 
+  cutlist = ect.InitCutList()
   
-  nseg = ect.eTree.GetEntries();
+  nsegcut = cutlist.GetN()
+  nseg = ect.eTree.GetEntries()
 
-  IDarray_plate = np.zeros(nseg,dtype=int)
-  PIDarray_plate = np.zeros(nseg,dtype=int)
+  IDarray_plate = np.zeros(nsegcut,dtype=int)
+  PIDarray_plate = np.zeros(nsegcut,dtype=int)
 
-  xarray_plate = np.zeros(nseg,dtype=np.float32)
-  yarray_plate = np.zeros(nseg,dtype=np.float32)
-  zarray_plate = np.zeros(nseg,dtype=np.float32)
-  TXarray_plate = np.zeros(nseg,dtype=np.float32)
-  TYarray_plate = np.zeros(nseg,dtype=np.float32)
+  xarray_plate = np.zeros(nsegcut,dtype=np.float32)
+  yarray_plate = np.zeros(nsegcut,dtype=np.float32)
+  zarray_plate = np.zeros(nsegcut,dtype=np.float32)
+  TXarray_plate = np.zeros(nsegcut,dtype=np.float32)
+  TYarray_plate = np.zeros(nsegcut,dtype=np.float32)
    
-  MCEvtarray_plate = np.zeros(nseg,dtype=int)
-  MCTrackarray_plate = np.zeros(nseg,dtype=int)
-  Parray_plate = np.zeros(nseg,dtype=np.float32)
-  Flagarray_plate = np.zeros(nseg,dtype=int)
+  MCEvtarray_plate = np.zeros(nsegcut,dtype=int)
+  MCTrackarray_plate = np.zeros(nsegcut,dtype=int)
+  Parray_plate = np.zeros(nsegcut,dtype=np.float32)
+  Flagarray_plate = np.zeros(nsegcut,dtype=int)
 
-  print ("loop over {} segments for plate {}".format(nseg,nplate))
-  for iseg in range(nseg):
-   #igoodsegment = goodcouples.GetEntry(iseg);
+  print ("loop on {} segments over  {} for plate {}".format(nsegcut, nseg,nplate))
+  for ientry in range(nsegcut):
+   iseg = cutlist.GetEntry(ientry);
    ect.GetEntry(iseg);
  
    seg=ect.eS
@@ -90,19 +98,19 @@ def builddataframe(brick, cutstring = "1"):
    #p.SetSegmentsPlate(idplate.ePlate);
 
 
-   IDarray_plate[iseg] = seg.ID();
-   PIDarray_plate[iseg] = seg.PID();
+   IDarray_plate[ientry] = seg.ID();
+   PIDarray_plate[ientry] = seg.PID();
    
-   xarray_plate[iseg] = seg.X();
-   yarray_plate[iseg] = seg.Y();
-   zarray_plate[iseg] = seg.Z();
-   TXarray_plate[iseg] = seg.TX();
-   TYarray_plate[iseg] = seg.TY();
+   xarray_plate[ientry] = seg.X();
+   yarray_plate[ientry] = seg.Y();
+   zarray_plate[ientry] = seg.Z();
+   TXarray_plate[ientry] = seg.TX();
+   TYarray_plate[ientry] = seg.TY();
 
-   MCEvtarray_plate[iseg] = seg.MCEvt();
-   MCTrackarray_plate[iseg] = seg.MCTrack();
-   Parray_plate[iseg] = seg.P();          
-   Flagarray_plate[iseg] = seg.Flag();   
+   MCEvtarray_plate[ientry] = seg.MCEvt();
+   MCTrackarray_plate[ientry] = seg.MCTrack();
+   Parray_plate[ientry] = seg.P();          
+   Flagarray_plate[ientry] = seg.Flag();   
 
   #end of loop, storing them in global arrays
   IDall = np.concatenate((IDall,IDarray_plate),axis=0)
