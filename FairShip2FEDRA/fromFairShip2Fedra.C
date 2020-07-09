@@ -43,7 +43,7 @@ void set_default(TEnv &cenv){ //setting default parameters, if not presents from
  cenv.SetValue("FairShip2Fedra.emuefficiency",0.85); //only if useefficiency map is set to false
  cenv.SetValue("FairShip2Fedra.dosmearing",1);
  cenv.SetValue("FairShip2Fedra.maxtheta",1); //angular max of scanning
- cenv.SetValue("FairShip2Fedra.minkinenergy",0.1); //do not pass particles beyond this value, track ID would be -2
+ cenv.SetValue("FairShip2Fedra.minmomentum",0.1); //do not pass particles beyond this value, track ID would be -2
  cenv.SetValue("FairShip2Fedra.ngrains",70); // to set weight
  cenv.SetValue("FairShip2Fedra.angres",0.003);//used for smearing, if dosmearing = true
 
@@ -65,7 +65,7 @@ void fromFairShip2Fedra(TString filename){
  int nbrick = cenv.GetValue("FairShip2Fedra.nbrick",1); // to set b00000%i number
 
  float angres = cenv.GetValue("FairShip2Fedra.angres",0.003); //Used cases: 3, 5milliradians. Constant value overwritten if useresfunction=true
- float minkinE = cenv.GetValue("FairShip2Fedra.minkinenergy",0.1);
+ float minmomentum = cenv.GetValue("FairShip2Fedra.minmomentum",0.1);
  float maxtheta = cenv.GetValue("FairShip2Fedra.maxtheta",1);
 
  const float ngrains = cenv.GetValue("FairShip2Fedra.ngrains",70) ; //the same number for all the couples, so they have the same weigth.
@@ -75,7 +75,7 @@ void fromFairShip2Fedra(TString filename){
  const bool dosmearing = cenv.GetValue("FairShip2Fedra.dosmearing",1); //gaussian smearing or not
  const bool useresfunction = false; //use resfunction from operadata instead of constant value
 
- cout<<"Starting conversion with efficiency "<<emuefficiency<<" maxtheta "<<maxtheta<<" and min kin E "<<minkinE<<endl;
+ cout<<"Starting conversion with efficiency "<<emuefficiency<<" maxtheta "<<maxtheta<<" and min momentum "<<minmomentum<<endl;
  //if not performed digitization
  const bool donedigi = false;
  int neventsxspill = cenv.GetValue("FairShip2Fedra.neventsxspill",1000);
@@ -173,7 +173,7 @@ void fromFairShip2Fedra(TString filename){
      if (nfilmhit > 1000) savehit = false;
      if (tantheta > TMath::Tan(maxtheta)) savehit = false; //we scan from theta 0 to a maximum of 1 rad
      if(charge == 0.) savehit = false; //we do not track neutral particles
-     if(kinenergy < minkinE) savehit = false; //particles with too low kin energy 
+     if(momentum < minmomentum) savehit = false; //particles with too low kin energy 
      //saving the hits for a plate in the corresponding couples (only one layer saved, the other has ID + 10000)             
  
      if (useefficiencymap){ //efficiency map with angle
