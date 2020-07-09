@@ -1,24 +1,24 @@
 import desy19_fedrautils as desy19
+import sys
 import pandas as pd
 import ROOT as r
 
-def applyconversion():
+def applyconversion(nbrick):
  '''convert couples ROOT files into a csv'''
 
- df = desy19.builddataframe(1)
+ df = desy19.builddataframe(nbrick)
 
  return df 
 
 #the two steps can now be done together, without an intermediate file
 
-simfile = r.TFile.Open("../pythia8_Geant4_1000_0.1_dig.root")
-#df = pd.read_csv('b000001.csv')
+nrun = int(sys.argv[1])
 
-df = applyconversion()
+df = applyconversion(nrun)
 
-df = df.drop(columns = ["P","Flag"])
-
-df = desy19.addtrueMCinfo(df,simfile, True)
-df.to_csv('b000001.csv',index=False)
+#df = df.drop(columns = ["P","Flag"])
+#simfile = r.TFile.Open(sys.argv[2])
+#df = desy19.addtrueMCinfo(df,simfile, True)
+df.to_csv('RUN{}.csv'.format(nrun),index=False)
 
 
