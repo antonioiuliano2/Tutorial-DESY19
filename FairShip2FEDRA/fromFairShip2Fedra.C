@@ -38,6 +38,7 @@ void set_default(TEnv &cenv){ //setting default parameters, if not presents from
  cenv.SetValue("FairShip2Fedra.nbrick",1);//to set b00000%i number
  cenv.SetValue("FairShip2Fedra.nplates",29);
  cenv.SetValue("FairShip2Fedra.nevents",10000); // number of events to be passed to FEDRA
+ cenv.SetValue("FairShip2Fedra.neventsxspill",1000); // number of events per spill
  cenv.SetValue("FairShip2Fedra.useefficiencymap",0);
  cenv.SetValue("FairShip2Fedra.emuefficiency",0.85); //only if useefficiency map is set to false
  cenv.SetValue("FairShip2Fedra.dosmearing",1);
@@ -75,6 +76,16 @@ void fromFairShip2Fedra(TString filename){
  const bool useresfunction = false; //use resfunction from operadata instead of constant value
 
  cout<<"Starting conversion with efficiency "<<emuefficiency<<" maxtheta "<<maxtheta<<" and min kin E "<<minkinE<<endl;
+ //if not performed digitization
+ const bool donedigi = false;
+ int neventsxspill = cenv.GetValue("FairShip2Fedra.neventsxspill",1000);
+ int ntotspills = nevents/neventsxspill;
+ float spilldy = 10./ntotspills;
+ cout<<"Generating "<<ntotspills<<" spills with dy "<<spilldy<<endl;
+ int nspill = 0;
+ float pottime = 0.;
+ float spilltime = 24.;  //beam 1.5 Hz, 3 electrons in 1 cm^2, 10 strips 1 cm separated
+ float targetmoverspeed = 0.5; //speed of Target Mover (cm/s)
 
  if (useefficiencymap){ 
   file = TFile::Open("efficiency_alltracks.root");
@@ -113,6 +124,8 @@ void fromFairShip2Fedra(TString filename){
  for (int i = 0; i < nevents; i++){
   if (i%1000==0) cout<<"processing event "<<i<<" out of "<<nevents<<endl;
   reader.Next();
+  pottime = gRandom->Uniform()*spilltime;
+  nspill = i/neventsxspill;
    for (const EmuDESYPoint& emupoint:emulsionhits){   
      bool savehit = true; //by default I save all hits
 //no you don't want to do this//     if (j % 2 == 0) continue;
@@ -123,11 +136,27 @@ void fromFairShip2Fedra(TString filename){
      
      if (trackID >= 0) motherID = tracks[trackID].GetMotherId();
      else motherID = -2; //hope I do not see them
-     xem = emupoint.GetX()* 1E+4 + 62500;
-     yem = emupoint.GetY()* 1E+4 + 49500;     
-     tx = emupoint.GetPx()/emupoint.GetPz();
-     ty = emupoint.GetPy()/emupoint.GetPz();  
-     tantheta = pow(pow(tx,2) + pow(ty,2),0.5);
+
+     if (!donedigi){    
+
+      xem = emupoint.GetX() -12.5/2. + pottime * targetmoverspeed + 0.25;
+      yem = emupoint.GetY() - 9.9/2. + nspill * spilldy + 0.5;
+      } 
+    
+      else{
+
+       xem = emupoint.GetX();
+       yem = emupoint.GetY();
+
+      }
+
+      xem = xem* 1E+4 + 62500;
+      yem = yem* 1E+4 + 49500;         
+     
+      tx = emupoint.GetPx()/emupoint.GetPz();
+      ty = emupoint.GetPy()/emupoint.GetPz();  
+      tantheta = pow(pow(tx,2) + pow(ty,2),0.5);
+
      double charge,mass;        
 
      if ((TDatabasePDG::Instance()->GetParticle(pdgcode))!=NULL){ 
