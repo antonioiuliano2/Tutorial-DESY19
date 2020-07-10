@@ -228,20 +228,39 @@ def addtrueMCinfo(df,simfile, ship_charm):
  return df
 
 def addtrackindex(df, trackfilename):
+ ''' adding track index to dataframe, if tracking was performed'''
  trackfile = r.TFile.Open(trackfilename)
  tracktree = trackfile.Get("tracks")
- df["TrackID"]=-1
- df["nseg"]=-1
- df=df.groupby(["PID","ID"]).first()
+ 
+ ntracks = tracktree.GetEntries()
+ #initial empty arrays, to be filled with segments from all tracks
+ IDall = np.zeros(0,dtype=int)
+ PIDall = np.zeros(0,dtype=int)
+ TrackIDall = np.zeros(0,dtype=int)
+
  print("start loop on {} tracks".format(tracktree.GetEntries()))
  for track in tracktree:
-  segments = track.s
   nseg = track.nseg
-  trid = track.trid
+  segments = track.s
+
+  #initial arrays, length given by number of segments of this tracks
+  IDarr = np.zeros(nseg,dtype=int)
+  PIDarr = np.zeros(nseg,dtype=int)
+  TrackIDarr = np.zeros(nseg,dtype=int)
+
   #start loop on segments
-  for seg in segments:
-   df.loc[(seg.PID(),seg.ID()),"TrackID"] = trid  
-   df.loc[(seg.PID(),seg.ID()),"nseg"] = nseg 
-   x = 0
- print("Speed test done")
- return df
+  for iseg, seg in enumerate(segments):
+   IDarr[iseg] = seg.ID()
+   PIDarr[iseg] = seg.PID()
+   TrackIDarr[iseg] = seg.Track()
+  #concatenate, adding segments for this track to the global arrays
+  IDall = np.concatenate((IDall,IDarr),axis=0)
+  PIDall = np.concatenate((PIDall,PIDarr),axis=0)
+  TrackIDall = np.concatenate((TrackIDall,TrackIDarr),axis=0)
+
+ labels = ["ID","PID","TrackID"]
+ dftracks = pd.DataFrame({"ID":IDall,"PID":PIDall,"TrackID":TrackIDall},columns = labels) 
+ print("Track dataframe ready: merging it with all couples dataframe: not tracked segments will be labelled as NA") 
+ #Now I need to merge them, however I want to keep all the segments, not only the ones which have been tracked. Luckily, there are many ways to do a merge (default is inner)
+ dfwithtracks = df.merge(dftracks,how = 'left', on=["PID","ID"])
+ return dfwithtracks
