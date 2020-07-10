@@ -3,15 +3,21 @@ import pandas as pd
 import fedrarootlogon
 import ROOT as r
 
-def builddataframe(brick, cutstring = "1"):
- """build pandas dataframe starting from couples and scanset """
+def builddataframe(brick, path = "..", cutstring = "1"):
+ """build pandas dataframe starting from couples and scanset 
+    brick = Number of brick as in b0000*
+    path = input path to the folder containing theb b0000* folder
+    cutsring = eventual selection to couples
+ """
  nplate =0
  major = 0
  minor = 0
 
+ print("Reading ScanSet at path ",path)
+
  #reading scanset
  sproc = r.EdbScanProc()
- sproc.eProcDirClient=".."
+ sproc.eProcDirClient=path
  id = r.EdbID(brick,nplate,major,minor)
  ss = sproc.ReadScanSet(id)
  ss.Brick().SetID(brick)
@@ -39,6 +45,7 @@ def builddataframe(brick, cutstring = "1"):
  print ("Cut on couples ")
  cut.Print()
 
+ print("Try to open folders at path ",path+"/b00000"+str(brick))
  for i in range(npl):
   idplate = ss.GetID(i)
       
@@ -49,9 +56,9 @@ def builddataframe(brick, cutstring = "1"):
 
   ect = r.EdbCouplesTree()
   if (nplate) <10:
-   ect.InitCouplesTree("couples","p00{}/{}.{}.0.0.cp.root".format(nplate,brick,nplate),"READ")
+   ect.InitCouplesTree("couples",path+"/b00000"+str(brick)+"/p00{}/{}.{}.0.0.cp.root".format(nplate,brick,nplate),"READ")
   else:
-   ect.InitCouplesTree("couples","p0{}/{}.{}.0.0.cp.root".format(nplate,brick,nplate),"READ")
+   ect.InitCouplesTree("couples",path+"/b00000"+str(brick)+"/p0{}/{}.{}.0.0.cp.root".format(nplate,brick,nplate),"READ")
 
   #addingcut
   ect.eCut = cut 
