@@ -5,19 +5,19 @@ import ROOT as r
 
 def builddataframe(brick, cutstring = "1"):
  """build pandas dataframe starting from couples and scanset """
- nplate =0;
- major = 0;
- minor = 0;
+ nplate =0
+ major = 0
+ minor = 0
 
  #reading scanset
- sproc = r.EdbScanProc();
- sproc.eProcDirClient="..";
- id = r.EdbID(brick,nplate,major,minor);
- ss = sproc.ReadScanSet(id);
- ss.Brick().SetID(brick);
+ sproc = r.EdbScanProc()
+ sproc.eProcDirClient=".."
+ id = r.EdbID(brick,nplate,major,minor)
+ ss = sproc.ReadScanSet(id)
+ ss.Brick().SetID(brick)
  
  #preparing patterns
- npl = ss.eIDS.GetEntries();
+ npl = ss.eIDS.GetEntries()
 
  cut = r.TCut(cutstring)
 
@@ -40,14 +40,14 @@ def builddataframe(brick, cutstring = "1"):
  cut.Print()
 
  for i in range(npl):
-  idplate = ss.GetID(i);
+  idplate = ss.GetID(i)
       
   nplate = idplate.ePlate
-  plate = ss.GetPlate(idplate.ePlate);
+  plate = ss.GetPlate(idplate.ePlate)
   #read pattern information
-  p = r.EdbPattern();
+  p = r.EdbPattern()
 
-  ect = r.EdbCouplesTree();
+  ect = r.EdbCouplesTree()
   if (nplate) <10:
    ect.InitCouplesTree("couples","p00{}/{}.{}.0.0.cp.root".format(nplate,brick,nplate),"READ")
   else:
@@ -76,41 +76,28 @@ def builddataframe(brick, cutstring = "1"):
 
   print ("loop on {} segments over  {} for plate {}".format(nsegcut, nseg,nplate))
   for ientry in range(nsegcut):
-   iseg = cutlist.GetEntry(ientry);
-   ect.GetEntry(iseg);
+   iseg = cutlist.GetEntry(ientry)
+   ect.GetEntry(iseg)
  
    seg=ect.eS
    #//setting z and affine transformation
-   seg.SetZ(plate.Z());
+   seg.SetZ(plate.Z())
    seg.SetPID(i)
-   seg.Transform(plate.GetAffineXY());
+   seg.Transform(plate.GetAffineXY())
 
-   #sproc.ReadPatCPnopar(p,idplate,cut);
-   #p.SetZ(plate.Z());
-   #p.SetSegmentsZ();
-   #p.SetID(i);
-   #p.SetPID(i);
-   #p.SetSegmentsPID();
-   #plate->Print();
-   #p.Transform(    plate.GetAffineXY()   );
-   #p.TransformShr( plate.Shr() );
-   #p.TransformA(   plate.GetAffineTXTY() );
-   #p.SetSegmentsPlate(idplate.ePlate);
-
-
-   IDarray_plate[ientry] = seg.ID();
-   PIDarray_plate[ientry] = seg.PID();
+   IDarray_plate[ientry] = seg.ID()
+   PIDarray_plate[ientry] = seg.PID()
    
-   xarray_plate[ientry] = seg.X();
-   yarray_plate[ientry] = seg.Y();
-   zarray_plate[ientry] = seg.Z();
-   TXarray_plate[ientry] = seg.TX();
-   TYarray_plate[ientry] = seg.TY();
+   xarray_plate[ientry] = seg.X()
+   yarray_plate[ientry] = seg.Y()
+   zarray_plate[ientry] = seg.Z()
+   TXarray_plate[ientry] = seg.TX()
+   TYarray_plate[ientry] = seg.TY()
 
-   MCEvtarray_plate[ientry] = seg.MCEvt();
-   MCTrackarray_plate[ientry] = seg.MCTrack();
-   Parray_plate[ientry] = seg.P();          
-   Flagarray_plate[ientry] = seg.Flag();   
+   MCEvtarray_plate[ientry] = seg.MCEvt()
+   MCTrackarray_plate[ientry] = seg.MCTrack()
+   Parray_plate[ientry] = seg.P()     
+   Flagarray_plate[ientry] = seg.Flag()   
 
   #end of loop, storing them in global arrays
   IDall = np.concatenate((IDall,IDarray_plate),axis=0)
