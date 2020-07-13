@@ -67,7 +67,7 @@ def drawallshowers(df,nshowers,axes):
  
   axes[1].plot(dfshower["z"],dfshower["y"],"o",fillstyle="none",c=color)
 
-  axes[2].plot(dfshower["z"],dfshower["y"],"o",fillstyle="none",c=color)
+  axes[2].plot(dfshower["z"],dfshower["x"],"o",fillstyle="none",c=color)
 
 
  axes[0].set_title("XY distribution of all surface")
