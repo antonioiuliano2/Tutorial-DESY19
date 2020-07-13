@@ -1,4 +1,4 @@
-#build a simplified global tree with all couples positions and angles, stored as numpy arrays
+#build a simplified global tree with all couples positions and angles, stored as numpy arrays, now outdated
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
