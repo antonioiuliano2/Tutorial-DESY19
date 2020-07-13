@@ -14,7 +14,7 @@ bool efficiency(const float tantheta, TH1D * emuefficiency);
 //start script
 void fromFairShip2Fedra(){
  
- fromFairShip2Fedra("ship.conical.Pythia8CharmOnly-TGeant4_dig.root");
+ fromFairShip2Fedra("ship.conical.PG_11-TGeant4.root");
 }
 
 TF1 angularresolution(){
@@ -124,7 +124,7 @@ void fromFairShip2Fedra(TString filename){
  for (int i = 0; i < nevents; i++){
   if (i%1000==0) cout<<"processing event "<<i<<" out of "<<nevents<<endl;
   reader.Next();
-  pottime = gRandom->Uniform()*spilltime;
+  pottime = grandom->Uniform()*spilltime;
   nspill = i/neventsxspill;
    for (const EmuDESYPoint& emupoint:emulsionhits){   
      bool savehit = true; //by default I save all hits
