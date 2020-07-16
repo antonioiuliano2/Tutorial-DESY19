@@ -1,0 +1,9 @@
+executable            = desyrec.sh
+arguments             = $(ClusterID) $(ProcId)
+output                = output/desy.$(ClusterId).$(ProcId).out
+error                 = error/desy.$(ClusterId).$(ProcId).err
+log                   = log/desy.$(ClusterId).log
+notification = Never
++JobFlavour             ="testmatch"
+queue 100
+
