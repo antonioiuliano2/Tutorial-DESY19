@@ -16,7 +16,7 @@ dfshower = dfshower[['x','y','z','TX','TY','MCEvent']]
 print(dfshower)
 
 y = dfshower.iloc[:,-1].values
-X = dfshower.iloc[:, [2,1]].values
+X = dfshower.iloc[:, [0,1]].values
 print(X)
 
 from sklearn.model_selection import train_test_split
