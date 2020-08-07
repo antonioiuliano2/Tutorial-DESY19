@@ -3,15 +3,14 @@ import pandas as pd
 import fedrarootlogon
 import ROOT as r
 
-def builddataframe(brick, path = "..", cutstring = "1"):
+def builddataframe(brick, path = "..", cutstring = "1", major = 0, minor = 0, newzprojection = None):
  """build pandas dataframe starting from couples and scanset 
     brick = Number of brick as in b0000*
     path = input path to the folder containing theb b0000* folder
     cutsring = eventual selection to couples
+    newzprojection = list of projection to a new z reference system
  """
  nplate =0
- major = 0
- minor = 0
 
  print("Reading ScanSet at path ",path)
 
@@ -56,9 +55,9 @@ def builddataframe(brick, path = "..", cutstring = "1"):
 
   ect = r.EdbCouplesTree()
   if (nplate) <10:
-   ect.InitCouplesTree("couples",path+"/b00000"+str(brick)+"/p00{}/{}.{}.0.0.cp.root".format(nplate,brick,nplate),"READ")
+   ect.InitCouplesTree("couples",path+"/b00000"+str(brick)+"/p00{}/{}.{}.{}.{}.cp.root".format(nplate,brick,nplate,major,minor),"READ")
   else:
-   ect.InitCouplesTree("couples",path+"/b00000"+str(brick)+"/p0{}/{}.{}.0.0.cp.root".format(nplate,brick,nplate),"READ")
+   ect.InitCouplesTree("couples",path+"/b00000"+str(brick)+"/p0{}/{}.{}.{}.{}.cp.root".format(nplate,brick,nplate,major,minor),"READ")
 
   #addingcut
   ect.eCut = cut 
@@ -91,6 +90,9 @@ def builddataframe(brick, path = "..", cutstring = "1"):
    seg.SetZ(plate.Z())
    seg.SetPID(i)
    seg.Transform(plate.GetAffineXY())
+
+   if(newzprojection is not None):
+    seg.PropagateTo(newzprojection[i])
 
    IDarray_plate[ientry] = seg.ID()
    PIDarray_plate[ientry] = seg.PID()

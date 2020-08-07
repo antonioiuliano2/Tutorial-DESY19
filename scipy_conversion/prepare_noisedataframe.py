@@ -4,12 +4,21 @@ import fedrarootlogon
 
 #defining functions for transformation
 
-def extractnoise(nrun,segcut="eCHI2P<2.5&&s.eW>13&&eN1==1&&eN2==1&&s1.eFlag>=0&&s2.eFlag>=0"):
+def extractnoise(nrun,major = 0, minor = 0, segcut="eCHI2P<2.5&&s.eW>13&&eN1==1&&eN2==1&&s1.eFlag>=0&&s2.eFlag>=0"):
  '''extract couples from first 2 plates according to selection'''
  import desy19_fedrautils as desy19
- path = "/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/RUN{}_data_p001".format(nrun)
- df = desy19.builddataframe(nrun,path,segcut)
- df.to_csv(path+("/b00000{}/firsttwoplates.csv".format(nrun)),index = False)
+
+ #we want to project to the z of sim, getting positions
+ simzlist = []
+ simsetfile = r.TFile.Open("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/runs_360events/RUN3_uniform_26_July_2020/b000003/b000003.0.0.0.set.root") 
+ simset = simsetfile.Get("set")
+ for ipl in range(simset.eIDS.GetEntries()):
+  simzlist.append(simset.GetPlate(simset.GetID(ipl).ePlate).Z())
+
+ path = "/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/RUN{}_data".format(nrun)
+ df = desy19.builddataframe(nrun,path,segcut, major, minor,simzlist)
+
+ df.to_csv(path+("/b00000{}/firsttwoplates_projected.csv".format(nrun)),index = False)
  return 0
 
 def reflectX(df0,df1):
@@ -70,16 +79,16 @@ def preparedataframe():
  ndataplates = 4 #the two first plates from two runs
 
  RUN1df = pd.read_csv("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/RUN1_data_p001/b000001/firsttwoplates.csv")
- RUN5df = pd.read_csv("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/RUN5_data_p001/b000005/firsttwoplates.csv")
+ RUN3df = pd.read_csv("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/RUN3_data_p001/b000003/firsttwoplates.csv")
 
  plates = []
 
  #duplicating dataframes for the plates of interest
- for i in range(7): # 7 copies of RUN5 first plate
-  plates.append(RUN5df.query("PID==1").copy())
+ for i in range(7): # 7 copies of RUN3 first plate
+  plates.append(RUN3df.query("PID==1").copy())
 
- for i in range(7): # 7 copies of RUN5 second plate
-  plates.append(RUN5df.query("PID==0").copy())
+ for i in range(7): # 7 copies of RUN3 second plate
+  plates.append(RUN3df.query("PID==0").copy())
 
  for i in range(7): # 7 copies of RUN1 first plate
   plates.append(RUN1df.query("PID==1").copy())
@@ -114,7 +123,7 @@ def preparedataframe():
   plates[6+i*diffplate] = reflectTY(plates[0+i*diffplate],plates[6+i*diffplate])
 
  #plate 29 (only from second plate of run1)
- plates[28] = reflectY(plates[(ndataplates-1)*diffplate],plates[28])
+ plates[28] = reflectX(plates[(ndataplates-1)*diffplate],plates[28])
  plates[28] = reflectY(plates[(ndataplates-1)*diffplate],plates[28])
  plates[28] = reflectTX(plates[(ndataplates-1)*diffplate],plates[28])
  plates[28] = reflectTY(plates[(ndataplates-1)*diffplate],plates[28])
@@ -138,3 +147,19 @@ def preparedataframe():
  allplates.to_csv("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/data_noise_DESY19.csv",index=False)
 
  return 0
+
+def mergedataframes():
+ '''merging shower sim and data dataframes'''
+ simdif = pd.read_csv("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/runs_360events/RUN3_uniform_26_July_2020/b000003/RUN3.csv_firsttenplates.csv")
+ datadf = pd.read_csv("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/RUN6_data/b000006/firsttenplates_projected.csv")
+
+ simdf["Signal"] = 1
+ datadf["Signal"] = 0
+
+ mergeddf = pd.concat([simdf,datadf])
+ mergeddf.to_csv("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/data_noise_firsttenplates_DESY19.csv",index=False)
+
+ 
+
+
+
