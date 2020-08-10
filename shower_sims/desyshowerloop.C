@@ -25,6 +25,9 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
 
  TH1D *hmaxsegments = new TH1D("hmaxsegments","number of segments at maximum;nelectrons",100,0,100);
 
+ TH1D *hconeangle = new TH1D("hconeangle"," Cone opening angle; #Theta [rad] ",100,0.,1.);
+ TH1D *hconeradius = new TH1D("hconeradius"," Cone radius; Radius [#mum]", 200, 0.,2000.);
+
  const int nevents = reader.GetEntries();
  
  cout<<"Starting loop over "<<nevents<<endl;
@@ -35,6 +38,8 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
 
  TVector3 vertexpos, hitpos;
  TVector3 startP;  
+
+ double tranverse_distance;
  double tx,ty;
 
  const int nangles = 20;
@@ -71,6 +76,9 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
  
          TVector3 displacement = hitpos - vertexpos; //vettore spostamento;         
          displacement_angle = displacement.Angle(startP);
+         tranverse_distance = TMath::Sqrt(pow(displacement[0],2)+ pow(displacement[1],2));
+         hconeangle->Fill(displacement_angle);
+         hconeradius->Fill(tranverse_distance);
 
          //checking particle information
          if(pdg->GetParticle(pdgcode)){
@@ -113,6 +121,13 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
  effgraph->SetMarkerColor(kRed);
  effgraph->SetMarkerStyle(8);
  effgraph->Draw("AP");
+
+ TCanvas *cCone = new TCanvas();
+ cCone->Divide(1,2);
+ cCone->cd(1);
+ hconeangle->Draw();
+ cCone->cd(2);
+ hconeradius->Draw();
 
  
  TCanvas *cE = new TCanvas();
