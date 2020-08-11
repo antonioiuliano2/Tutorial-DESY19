@@ -56,8 +56,8 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
   coneangles[ipoint] = coneangles[ipoint-1]+0.01;
   coneradii[ipoint] = coneradii[ipoint-1]+100;
  }
-
- TH2D *hecoll2D = new TH2D("hecoll2D","Collected electron efficiency;angle;Radius",npoints,coneangles[0],coneangles[npoints-1],npoints,coneradii[0],coneradii[npoints-1]);
+ cout<<"TEST "<<coneangles[npoints-1]<<endl;
+ TH2D *hecoll2D = new TH2D("hecoll2D","Collected electron efficiency;angle[rad];Radius[#mu m]",npoints,coneangles[0],coneangles[npoints-1]+0.01,npoints,coneradii[0],coneradii[npoints-1]+100);
 
  int nelectronstot = 0;
 
@@ -100,9 +100,10 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
            hconeangle->Fill(displacement_angle);
            hconeradius->Fill(tranverse_distance *1.e+4);
            //is hit inside cone+cylinder acceptance region
-           for(int ipoint = 0; ipoint < npoints; ipoint++){ //is hit inside cone?
-
-            if(TMath::Abs(displacement_angle) < coneangles[ipoint] && TMath::Abs(tranverse_distance*1.e+4) < coneradii[ipoint] ) nincone[iangle]++;
+           for(double & maxconeangle: coneangles){ //is hit inside cone?
+            for (double & maxconeradius: coneradii){
+             if(TMath::Abs(displacement_angle) < maxconeangle && TMath::Abs(tranverse_distance*1.e+4) < maxconeradius ) hecoll2D->Fill(maxconeangle+0.001,maxconeradius+10.);
+            }
 
            }  
            nelectronstot++;
@@ -127,6 +128,11 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
   hmaxsegments->Fill(maxelectrons);
  } //end of event loop 
 
+ TCanvas *cecoll2D = new TCanvas();
+ hecoll2D->Scale(1./nelectronstot);
+ gStyle->SetPaintTextFormat("4.2f");
+ hecoll2D->Draw("COLZ && TEXT");
+/*
  for(int iangle = 0; iangle < nangles; iangle++){
   effgraph->SetPoint(iangle, coneangles[iangle], (double) nincone[iangle]/nelectronstot);
  }
@@ -135,7 +141,7 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
  effgraph->GetYaxis()->SetRangeUser(0.,1.);
  effgraph->SetMarkerColor(kRed);
  effgraph->SetMarkerStyle(8);
- effgraph->Draw("AP");
+ effgraph->Draw("AP");*/
 
  TCanvas *cCone = new TCanvas();
  cCone->Divide(1,2);
