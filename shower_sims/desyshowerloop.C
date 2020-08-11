@@ -25,8 +25,8 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
 
  TH1D *hmaxsegments = new TH1D("hmaxsegments","number of segments at maximum;nelectrons",100,0,100);
 
- TH1D *hconeangle = new TH1D("hconeangle"," Cone opening angle; #Theta [rad] ",100,0.,1.);
- TH1D *hconeradius = new TH1D("hconeradius"," Cone radius; Radius [#mum]", 200, 0.,2000.);
+ TH1D *hconeangle = new TH1D("hconeangle"," Cone opening angle; #Theta [rad] ",200,0.,0.2);
+ TH1D *hconeradius = new TH1D("hconeradius"," Transverse distance from the shower origin; #Delta R[#mum]", 300, 0.,3000.);
 
  const int nevents = reader.GetEntries();
  
@@ -42,11 +42,23 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
  double tranverse_distance;
  double tx,ty;
 
- const int nangles = 20;
+ const int npoints = 20;
 
  double displacement_angle;
- double coneangles[nangles] = {0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.10,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.20};
- int nincone[nangles] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; //n particles in cone (for all showers)
+ double coneangles[npoints];
+ double coneradii[npoints];
+
+ //arrays initializations
+ coneangles[0] = 0.01;
+ coneradii[0] = 100;
+
+ for (int ipoint = 1; ipoint < npoints; ipoint++){
+  coneangles[ipoint] = coneangles[ipoint-1]+0.01;
+  coneradii[ipoint] = coneradii[ipoint-1]+100;
+ }
+
+ TH2D *hecoll2D = new TH2D("hecoll2D","Collected electron efficiency;angle;Radius",npoints,coneangles[0],coneangles[npoints-1],npoints,coneradii[0],coneradii[npoints-1]);
+
  int nelectronstot = 0;
 
  TGraph *effgraph = new TGraph();
@@ -76,9 +88,7 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
  
          TVector3 displacement = hitpos - vertexpos; //vettore spostamento;         
          displacement_angle = displacement.Angle(startP);
-         tranverse_distance = TMath::Sqrt(pow(displacement[0],2)+ pow(displacement[1],2));
-         hconeangle->Fill(displacement_angle);
-         hconeradius->Fill(tranverse_distance);
+         tranverse_distance = TMath::Sqrt(pow(displacement.X(),2)+ pow(displacement.Y(),2));
 
          //checking particle information
          if(pdg->GetParticle(pdgcode)){
@@ -87,8 +97,13 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
           //saving info for electrons and positrons above visibility threshold
           if (TMath::Abs(charge)>0 && momentum > 0.03 && TMath::ATan(TMath::Sqrt(tx*tx+ty*ty))<1.){
           
-           for(int iangle = 0; iangle < nangles; iangle++){ //is hit inside cone?
-            if(TMath::Abs(displacement_angle) < coneangles[iangle]) nincone[iangle]++;
+           hconeangle->Fill(displacement_angle);
+           hconeradius->Fill(tranverse_distance *1.e+4);
+           //is hit inside cone+cylinder acceptance region
+           for(int ipoint = 0; ipoint < npoints; ipoint++){ //is hit inside cone?
+
+            if(TMath::Abs(displacement_angle) < coneangles[ipoint] && TMath::Abs(tranverse_distance*1.e+4) < coneradii[ipoint] ) nincone[iangle]++;
+
            }  
            nelectronstot++;
            
