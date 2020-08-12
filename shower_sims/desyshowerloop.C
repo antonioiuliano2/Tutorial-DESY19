@@ -3,6 +3,9 @@ Works without any include, provided that we are in FairShip environment,
 just launch root -l simple_loop in the folder with the simulation output*/
 void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
 
+ TF1 *Ecalf = new TF1("Ecalf","pol1",0,500);
+ Ecalf->SetParameters(0.675673,0.0221365);
+
  TFile *file = TFile::Open(filename.Data(),"READ"); 
  if (!file) return;
  TTreeReader reader("cbmsim",file);
@@ -18,6 +21,7 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
  int ientry = 0;
  int pdgcode,plateid;
  double mass, charge,momentum, energy;
+ double showerenergy;
 
  TProfile * hE_pid = new TProfile("hE_pid","Energy vs PID;PID;E[GeV]", nplates,1,nplates+1, 0, 400);
  TH1I *hoccupancy = new TH1I("hoccupancy","Number of particles per plate", nplates,1, nplates+1);
@@ -27,6 +31,9 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
 
  TH1D *hconeangle = new TH1D("hconeangle"," Cone opening angle; #Theta [rad] ",200,0.,0.2);
  TH1D *hconeradius = new TH1D("hconeradius"," Transverse distance from the shower origin; #Delta R[#mum]", 300, 0.,3000.);
+
+ TProfile *hmolt_energy = new TProfile("hmolt_energy","Number of electrons vs shower energy;nelectrons;E[GeV]",50,0,500,0,8);
+ TH1D *hEres = new TH1D("hEres","Energy relative resolution between 2 and 6 GeV;#DeltaE/E",30,-1.5,1.5);
 
  const int nevents = reader.GetEntries();
  
@@ -60,19 +67,22 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
  TH2D *hecoll2D = new TH2D("hecoll2D","Collected electron efficiency;angle[rad];Radius[#mu m]",npoints,coneangles[0],coneangles[npoints-1]+0.01,npoints,coneradii[0],coneradii[npoints-1]+100);
 
  int nelectronstot = 0;
+ int nelectronsshower = 0;
 
  TGraph *effgraph = new TGraph();
 
  for(int ievent = 0; ievent<nevents;ievent++){
+     //resetting number of electrons;
+     nelectronsshower = 0;
      for(int iplate =0; iplate < nplates; iplate++){
-      nelectrons[iplate] = 0; //resetting number of electrons;
+      nelectrons[iplate] = 0; 
      }
 
      reader.SetEntry(ievent);
      //vertex track position and angles
      vertexpos.SetXYZ(tracks[0].GetStartX(),tracks[0].GetStartY(),tracks[0].GetStartZ());
      startP.SetXYZ(tracks[0].GetPx(), tracks[0].GetPy(), tracks[0].GetPz());
-   
+     showerenergy = tracks[0].GetEnergy();
      //access the hits:    
      for (const EmuDESYPoint& emupoint: emupoints){
          //pdgcode and kinematics
@@ -107,6 +117,7 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
 
            }  
            nelectronstot++;
+           nelectronsshower++;
            
 
            energy = TMath::Sqrt(mass*mass + momentum * momentum);         
@@ -126,6 +137,9 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
   }
   hmaxplate->Fill(maxplate+1);
   hmaxsegments->Fill(maxelectrons);
+  if (showerenergy > 3 && nelectronsshower < 50) cout<<"Strange shower with electrons "<<nelectronsshower<<" in event "<<ievent<<endl;
+  hmolt_energy->Fill(nelectronsshower,showerenergy);
+  if (showerenergy >= 2 && showerenergy <= 6) hEres->Fill((showerenergy- Ecalf->Eval(nelectronsshower))/showerenergy);
  } //end of event loop 
 
  TCanvas *cecoll2D = new TCanvas();
@@ -164,4 +178,13 @@ void desyshowerloop(TString filename = "ship.conical.PG_11-TGeant4.root"){
  hmaxplate->Draw();
  cmax->cd(2);
  hmaxsegments->Draw();
+
+ TCanvas *cmoltE = new TCanvas();
+ cmoltE->Divide(2,1);
+ cmoltE->cd(1);
+ hmolt_energy->Draw();
+ hmolt_energy->Fit("pol1","","",50,300);
+ cmoltE->cd(2);
+ hEres->Draw();
+ hEres->Fit("gaus");
 }
