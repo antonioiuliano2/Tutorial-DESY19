@@ -50,7 +50,7 @@ void shower_reconstruction()
     int brick = cenv.GetValue("showerrec.nbrick", 1);
     int nplate = 0;
     int major = 0;
-    int minor = 0;
+    int minor = 1000;
 
     cout<<"test "<<brick<<endl;
     cenv.SetValue("showerrec.env", env);        
@@ -167,4 +167,93 @@ void shower_reconstruction()
           eShowerRec->PrintRecoShowerArray();
           outputfile->Close();
          }   
+}
+
+void drawshower(int ishower){
+    TEnv cenv("showerrecenv");
+    set_default(cenv);
+    cenv.ReadFile( cenv.GetValue("showerrec.env", "showerrec.rootrc"),kEnvLocal);
+    gEDBDEBUGLEVEL        = cenv.GetValue("showerrec.EdbDebugLevel", 1);
+    const char *env       = cenv.GetValue("showerrec.env", "showerrec.rootrc");
+    const char *outdir    = cenv.GetValue("showerrec.outdir", "..");
+
+    int brick = cenv.GetValue("showerrec.nbrick", 1);
+    int nplate = 0;
+    int major = 0;
+    int minor = 1000;
+
+    cout<<"test "<<brick<<endl;
+    cenv.SetValue("showerrec.env", env);        
+    
+    cenv.SetValue("showerrec.outdir", outdir);
+
+    cenv.WriteFile("showerrec.save.rootrc");
+
+    
+    EdbScanProc sproc;
+    sproc.eProcDirClient=outdir;
+    printf("\n----------------------------------------------------------------------------\n");
+    printf("tracking set %d.%d.%d.%d\n", brick,nplate, major,minor);
+    printf("----------------------------------------------------------------------------\n\n");
+
+    EdbID id(brick,nplate,major,minor);
+    EdbScanSet *ss = sproc.ReadScanSet(id);
+    ss->Brick().SetID(brick);
+  
+    EdbPVRec * eEdbPVRec = new EdbPVRec();
+    TCut c = "1";
+    TCut trackcut = cenv.GetValue("showerrec.trkcut","1");
+
+    int npl = ss->eIDS.GetEntries();
+    //building pvrec from scanset
+    for(int i=0; i<npl; i++) {
+           EdbID *idplate = ss->GetID(i);
+      
+           EdbPlateP *plate = ss->GetPlate(idplate->ePlate);
+           //read pattern information
+           EdbPattern *p = new EdbPattern();
+           sproc.ReadPatCPnopar(*p,*idplate, c);
+           p->SetZ(plate->Z());
+           p->SetSegmentsZ();
+           p->SetID(i);
+           p->SetPID(i);
+           p->SetSegmentsPID();
+          //plate->Print();
+           p->Transform(    plate->GetAffineXY()   );
+           p->TransformShr( plate->Shr() );
+           p->TransformA(   plate->GetAffineTXTY() );
+           p->SetSegmentsPlate(idplate->ePlate);
+           eEdbPVRec->AddPattern(p);
+    } //end of loop on patt
+
+    //drawing shower
+    TFile *showerfile = TFile::Open("Shower.root");
+    TTree *showertree = (TTree*) showerfile->Get("treebranch");
+
+    int sizeb; 
+    const int maxsize = 10000; //as in ShowerRec
+    int idb[maxsize]; //IDs of basetracks
+    int plateb[maxsize]; //number of plate of base track
+    //setting branch addresses
+    showertree->SetBranchAddress("sizeb",&sizeb);
+    showertree->SetBranchAddress("idb",&idb);
+    showertree->SetBranchAddress("plateb",&plateb);
+
+    TObjArray *sarr = new TObjArray();
+    //filling array with segments
+    showertree->GetEntry(ishower);
+    for (int iseg = 0; iseg < sizeb; iseg++){
+        //getting edbseg (need to apply affine transformations)
+        int vid = eEdbPVRec->Vid( plateb[iseg], idb[iseg]);// vid =  pid*1000000+sid, identify a segment in a unique way
+        sarr->Add(eEdbPVRec->GetSegment(vid));
+    }
+
+     //DISPLAY OF SEGMENTS
+    const char *dsname = "Test shower reconstruction";
+    EdbDisplay * ds = new EdbDisplay(dsname,-100000.,100000.,-100000.,100000.,-40000., 0.);
+    //ds->SetVerRec(gEVR);
+    ds->SetDrawTracks(4);
+    ds->SetArrSegP( sarr );
+    ds->Draw();
+
 }
