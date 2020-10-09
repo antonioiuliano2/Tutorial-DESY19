@@ -50,9 +50,8 @@ void shower_reconstruction()
     int brick = cenv.GetValue("showerrec.nbrick", 1);
     int nplate = 0;
     int major = 0;
-    int minor = 1000;
+    int minor = 0;
 
-    cout<<"test "<<brick<<endl;
     cenv.SetValue("showerrec.env", env);        
     
     cenv.SetValue("showerrec.outdir", outdir);
