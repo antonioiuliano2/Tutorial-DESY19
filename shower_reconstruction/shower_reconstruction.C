@@ -49,8 +49,8 @@ void shower_reconstruction()
 
     int brick = cenv.GetValue("showerrec.nbrick", 1);
     int nplate = 0;
-    int major = 0;
-    int minor = 1000;
+    int major = cenv.GetValue("showerrec.major", 0);
+    int minor = cenv.GetValue("showerrec.minor", 0);
 
     cout<<"test "<<brick<<endl;
     cenv.SetValue("showerrec.env", env);        
@@ -171,6 +171,7 @@ void shower_reconstruction()
 
 void drawshower(int whichshower = -1){
     //drawing shower with entry ishower. If not provided, draw all showers according to selection
+    bool isEDA = true; //EDA vs standard FEDRA display
     TCut cutentries = "sizeb>82&&output30>0.9";
     TFile *showerfile = TFile::Open("Shower.root");
     TTree *showertree = (TTree*) showerfile->Get("treebranch");
@@ -191,6 +192,7 @@ void drawshower(int whichshower = -1){
     showertree->SetBranchAddress("tyb",&tyb);
 
     TObjArray *sarr = new TObjArray();
+    TObjArray *tarr = new TObjArray();
 
     showertree->Draw(">>lst", cutentries );
     TEventList *lst = (TEventList*)gDirectory->GetList()->FindObject("lst");
@@ -209,18 +211,37 @@ void drawshower(int whichshower = -1){
         newseg->SetZ(zb[iseg]);
         newseg->SetDZ(300.);
         newseg->SetPID(plateb[iseg]);
+        newseg->SetPlate(29 - plateb[iseg]);
 
         sarr->Add(newseg);
+
+        //need a virtual 1-seg track for EDA, which draws only tracks
+        EdbTrackP *newtrack = new EdbTrackP();
+
+        newtrack->SetPID(newseg->PID());
+        newtrack->SetID(newseg->ID());
+        newtrack->AddSegment(newseg);
+        tarr->Add(newtrack);
 
      }
     }
 
+    if (isEDA){
+        EdbPVRec *ali = new EdbPVRec();
+        ali->eTracks = tarr;
+        EdbEDA * eda = new EdbEDA(ali);
+        //eda->SetColorMode(kCOLOR_BY_PLATE);
+        eda->Run();
+    }
+    else{
      //DISPLAY OF SEGMENTS
-    const char *dsname = "Test shower reconstruction";
-    EdbDisplay * ds = new EdbDisplay(dsname,-100000.,100000.,-100000.,100000.,-40000., 0.);
-    //ds->SetVerRec(gEVR);
-    ds->SetDrawTracks(4);
-    ds->SetArrSegP( sarr );
-    ds->Draw();
+     const char *dsname = "Test shower reconstruction";
+     EdbDisplay * ds = new EdbDisplay(dsname,-100000.,100000.,-100000.,100000.,-40000., 0.);
+     //ds->SetVerRec(gEVR);
+     ds->SetDrawTracks(4);
+     ds->SetArrSegP( sarr );
+     ds->Draw();
+    }
+
 
 }
