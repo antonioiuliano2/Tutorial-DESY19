@@ -3,7 +3,7 @@ import pandas as pd
 import fedrarootlogon
 import ROOT as r
 
-def builddataframe(brick, path = "..", cutstring = "1", major = 0, minor = 0, newzprojection = None):
+def builddataframe(brick, path = "..", cutstring = "1", major = 0, minor = 0, newzprojection = None, charmsim = False):
  """build pandas dataframe starting from couples and scanset 
     brick = Number of brick as in b0000*
     path = input path to the folder containing theb b0000* folder
@@ -106,7 +106,10 @@ def builddataframe(brick, path = "..", cutstring = "1", major = 0, minor = 0, ne
    MCEvtarray_plate[ientry] = seg.MCEvt()
    MCTrackarray_plate[ientry] = seg.MCTrack()
    Parray_plate[ientry] = seg.P()     
-   Flagarray_plate[ientry] = seg.Flag()   
+   if charmsim: #different place where pdgcode is stored
+    Flagarray_plate[ientry] = seg.Vid(0)
+   else:
+    Flagarray_plate[ientry] = seg.Flag()  
 
   #end of loop, storing them in global arrays
   IDall = np.concatenate((IDall,IDarray_plate),axis=0)
@@ -167,10 +170,12 @@ def addtrueMCinfo(df,simfile, ship_charm):
 
  #preparing arrays with new columns
  arr_MotherID = np.zeros(nsegments, dtype=int)
+ arr_ProcID = np.zeros(nsegments, dtype=int)
 
  arr_startX = np.zeros(nsegments,dtype=float)
  arr_startY = np.zeros(nsegments,dtype=float)
  arr_startZ = np.zeros(nsegments,dtype=float)
+ arr_startT = np.zeros(nsegments,dtype=float)
  
  arr_startPx = np.zeros(nsegments,dtype=float)
  arr_startPy = np.zeros(nsegments,dtype=float)
@@ -199,10 +204,12 @@ def addtrueMCinfo(df,simfile, ship_charm):
   #adding values
   mytrack = eventtracks[MCTrack]
   arr_MotherID[isegment] = mytrack.GetMotherId()
+  arr_ProcID[isegment] = mytrack.GetProcID()
 
   arr_startX[isegment] = (mytrack.GetStartX() + xoffset) * 1e+4 + 62500 #we need also to convert cm to micron
   arr_startY[isegment] = (mytrack.GetStartY() + yoffset) * 1e+4 + 49500
   arr_startZ[isegment] = (mytrack.GetStartZ() + zoffset) * 1e+4
+  arr_startT[isegment] = mytrack.GetStartT()
   
   arr_startPx[isegment] = mytrack.GetPx()
   arr_startPy[isegment] = mytrack.GetPy()
@@ -212,10 +219,12 @@ def addtrueMCinfo(df,simfile, ship_charm):
  
  #adding the new columns to the dataframe
  df["MotherID"] = arr_MotherID 
+ df["ProcID"] = arr_ProcID
 
  df["StartX"] = arr_startX
  df["StartY"] = arr_startY
  df["StartZ"] = arr_startZ
+ df["StartTime"] = arr_startT
 
  df["startPx"] = arr_startPx
  df["startPy"] = arr_startPy
