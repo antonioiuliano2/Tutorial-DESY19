@@ -1,6 +1,6 @@
 //script to collect couples from all plate files with a required condition. If needed, they can also be drawn with FEDRA display ("uploaded on 22 May 2020, A.Iuliano")
 void drawcouples(){
- bool dodraw=false;
+ bool dodraw=true;
  TString condition = TString("1"); //which segments to select
  const int ibrick = 1; //brick code
  const int nplates = 57; //number of plates for brick

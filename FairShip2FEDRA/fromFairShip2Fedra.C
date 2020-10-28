@@ -37,6 +37,7 @@ TF1 angularresolution(){
 void set_default(TEnv &cenv){ //setting default parameters, if not presents from file
  cenv.SetValue("FairShip2Fedra.nbrick",1);//to set b00000%i number
  cenv.SetValue("FairShip2Fedra.nplates",29);
+ cenv.SetValue("FairShip2Fedra.donedigi",0);//was performed digitization?
  cenv.SetValue("FairShip2Fedra.nevents",10000); // number of events to be passed to FEDRA
  cenv.SetValue("FairShip2Fedra.neventsxspill",1000); // number of events per spill
  cenv.SetValue("FairShip2Fedra.useefficiencymap",0);
@@ -77,11 +78,11 @@ void fromFairShip2Fedra(TString filename){
 
  cout<<"Starting conversion with efficiency "<<emuefficiency<<" maxtheta "<<maxtheta<<" and min momentum "<<minmomentum<<endl;
  //if not performed digitization
- const bool donedigi = false;
+ const bool donedigi = cenv.GetValue("FairShip2Fedra.donedigi",0);
  int neventsxspill = cenv.GetValue("FairShip2Fedra.neventsxspill",1000);
  int ntotspills = nevents/neventsxspill;
  float spilldy = 10./ntotspills;
- cout<<"Generating "<<ntotspills<<" spills with dy "<<spilldy<<endl;
+ if(!donedigi) cout<<"Generating "<<ntotspills<<" spills with dy "<<spilldy<<endl;
  int nspill = 0;
  float pottime = 0.;
  float spilltime = 24.;  //beam 1.5 Hz, 3 electrons in 1 cm^2, 10 strips 1 cm separated
