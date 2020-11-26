@@ -169,9 +169,8 @@ void shower_reconstruction()
          }   
 }
 
-void drawshower(int whichshower = -1){
+void drawshower(int whichshower = -1, int nplates = 29, bool isEDA = false){
     //drawing shower with entry ishower. If not provided, draw all showers according to selection
-    bool isEDA = true; //EDA vs standard FEDRA display
     TCut cutentries = "sizeb>82&&output30>0.9";
     TFile *showerfile = TFile::Open("Shower.root");
     TTree *showertree = (TTree*) showerfile->Get("treebranch");
@@ -201,6 +200,7 @@ void drawshower(int whichshower = -1){
     int ishower = whichshower;
     if (whichshower >= 0) ngoodshowers = 1;
     //start loop over all good showers, filling array with segments
+    cout<<"Drawing shower nr "<<whichshower<<"nplates set to "<<nplates<<endl;
     cout<<"Looping over "<<ngoodshowers<<" showers "<<endl;
     for (int ientry = 0; ientry < ngoodshowers; ientry++){
      if(whichshower < 0) ishower = lst->GetEntry(ientry);
@@ -211,7 +211,7 @@ void drawshower(int whichshower = -1){
         newseg->SetZ(zb[iseg]);
         newseg->SetDZ(300.);
         newseg->SetPID(plateb[iseg]);
-        newseg->SetPlate(29 - plateb[iseg]);
+        newseg->SetPlate(nplates - plateb[iseg]);
 
         sarr->Add(newseg);
 
