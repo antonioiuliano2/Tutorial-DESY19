@@ -6,6 +6,10 @@ void align_check(TString runname, int lastplate=57, int firstplate=1);
 //checks dz between plates after alignment
 void checkdz(TString runname, int lastplate=57, int firstplate=1, int major = 0, int minor = 0){
  //syntax for brickname is 002, 022, 111
+ bool savegraph = true;
+ TFile *outputfile;
+ if (savegraph) outputfile = new TFile("dzgraph.root","RECREATE");
+
  TString dir = TString("/ship/DESY2019/");
 
  int ipoint = 0;
@@ -46,7 +50,11 @@ void checkdz(TString runname, int lastplate=57, int firstplate=1, int major = 0,
  hgraphA->Draw("AP*");
  hgraphA->GetXaxis()->SetTitle("nplate");
  hgraphA->GetYaxis()->SetTitle("dZ[#mum]");
-
+ if (savegraph){
+  outputfile->cd();
+  hgraphA->Write();
+  outputfile->Close();
+ }
 }
 
 //check alignment plots (currently xy and zphi)
