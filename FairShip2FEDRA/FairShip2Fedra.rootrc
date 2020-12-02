@@ -1,9 +1,11 @@
-FairShip2Fedra.nevents          300
-FairShip2Fedra.nbrick           5
+FairShip2Fedra.nevents          360
+FairShip2Fedra.neventsxspill    36
+FairShip2Fedra.donedigi         1
+FairShip2Fedra.nbrick           3
 FairShip2Fedra.nplates          29
-FairShip2Fedra.minkinenergy     0.03
+FairShip2Fedra.minmomentum      0.03
 FairShip2Fedra.ngrains          70
 FairShip2Fedra.dosmearing       1
 FairShip2Fedra.useefficiencymap 0
-FairShip2Fedra.emuefficiency    0.85
+FairShip2Fedra.emuefficiency    1.0
 FairShip2Fedra.angres           0.003
