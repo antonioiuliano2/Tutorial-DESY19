@@ -3,7 +3,6 @@ arguments             = $(ClusterID) $(ProcId)
 output                = output/desy.$(ClusterId).$(ProcId).out
 error                 = error/desy.$(ClusterId).$(ProcId).err
 log                   = log/desy.$(ClusterId).log
-getenv = true
 notification = Never
 +JobFlavour             ="testmatch"
 queue 100
