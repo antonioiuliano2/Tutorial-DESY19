@@ -2,8 +2,8 @@ showerrec.nbrick:                        3
 showerrec.cpcut:                         1
 showerrec.trkcut:                        s[0].Plate()<4 && s[0].Theta()<0.05
 showerrec.firstsegment:                  1
-showerrec.ConeRadius:                    800
-showerrec.ConeAngle:                     0.1
+showerrec.ConeRadius:                    1000
+showerrec.ConeAngle:                     0.04
 showerrec.ConnectionDR:                  150
 showerrec.ConnectionDT:                  0.15
 showerrec.NPropagation:                  3
