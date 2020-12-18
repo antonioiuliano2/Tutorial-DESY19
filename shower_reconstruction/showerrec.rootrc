@@ -1,6 +1,6 @@
-showerrec.nbrick:                        1
+showerrec.nbrick:                        3
 showerrec.cpcut:                         1
-showerrec.trkcut:                        nseg>3 && s[nseg-1].ePID==52
+showerrec.trkcut:                        s[0].Plate()<4 && s[0].Theta()<0.05
 showerrec.firstsegment:                  1
 showerrec.ConeRadius:                    800
 showerrec.ConeAngle:                     0.1
