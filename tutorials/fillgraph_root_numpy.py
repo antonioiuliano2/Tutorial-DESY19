@@ -7,8 +7,8 @@ import root_numpy
 
 
 def combinevectors(arrx,arry):
- arrx = arrx[:, np.newsize]
- arry = arry[:, np.newsize]
+ arrx = arrx[:, np.newaxis]
+ arry = arry[:, np.newaxis]
  #concatenate along columns
  arrxy = np.concatenate([arrx,arry],axis=1)
  return arrxy
@@ -28,10 +28,10 @@ def fillhist(hist, arrx, arry):
 #a quick test
 
 x = np.linspace(100,0,100)
-y = x *x + 2 x
+y = x *x + 2 * x
 
 graph = r.TGraph()
 
 fillgraph(graph, x, y)
 
-graph.Draw("AP*)
+graph.Draw("AP*")
