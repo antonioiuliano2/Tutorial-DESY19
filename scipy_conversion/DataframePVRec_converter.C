@@ -105,6 +105,42 @@ void doshowerreco(){
           eShowerRec->PrintRecoShowerArray();
 }
 
+void countsignal_dataframe(){
+    //saving a tree file with nsignal and nbackground for each event, denominators for efficiency estimation
+    //in Maria's dataset she kept conting events from previous datasets, this then does not start from 0
+    ROOT::RDataFrame df = ROOT::RDF::MakeCsvDataFrame("Final_dataset_RUN3_3.csv");
+    const int startshowerevent = 720;
+    const int endshowerevent = 1080;
+    const int ntotalshowers = endshowerevent - startshowerevent;
+    //preparing outputtree
+    int MCEventID, nsignal, nbackground;
+    TFile *outputfile = new TFile("Final_dataset_RUN3_3_nsigbkg.root","RECREATE");
+    TTree *expectedshowers = new TTree("expectedshowers","Signal and background in each shower provided by Maria");
+    expectedshowers->Branch("MCEventID",&MCEventID, "MCEventID/I");
+    expectedshowers->Branch("nsignal",&nsignal,"nsignal/I");
+    expectedshowers->Branch("nbackground",&nbackground,"nbackground/I");
+    //loop over all reconstructed showers, counting signal and background
+    cout<<"Total number of showers "<< ntotalshowers<<endl;
+    for (int ishower = startshowerevent; ishower < startshowerevent + ntotalshowers; ishower++){
+      cout<<"Arrived at shower "<<MCEventID<<endl;
+      MCEventID = ishower;
+      //getting the input dataframe for that event
+      auto df0 = df.Filter(Form("Ishower==%i",MCEventID));
+      auto nsignaldf = df0.Filter("Signal==1").Count();
+      auto nbackgrounddf = df0.Filter("Signal==0").Count();
+      //RDataframe store counters in pointers, need to access values to store them inside the TTree.
+      nsignal = *nsignaldf;
+      nbackground = *nbackgrounddf;
+      //filling shower, going to next one
+      expectedshowers->Fill();
+    }
+    //end of loop, writing output
+    outputfile->cd();
+    expectedshowers->Write();
+    outputfile->Close();
+
+}
+
 vector<double> eff_formula(int foundevents, int totalevents){
   vector<double> efficiency; //value and error
   
