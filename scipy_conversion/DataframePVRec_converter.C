@@ -1,3 +1,8 @@
+//list of functions used for shower reconstruction from Maria dataset and efficiency estimation
+//Created on 29 December 2020 by A.Iuliano
+//Only thefirst time: launch countsignal_dataframe() to store number of initial signal and bacgkround from each event in a TTree
+//Launch each shower reconstruction with doshowerrec()
+//Evaluate efficiency and background rejections (Recalls for signal and background) with efficiency()
 EdbPVRec* DataframePVRec_converter(){
     EdbPVRec *gAli = new EdbPVRec();
 
@@ -122,8 +127,8 @@ void countsignal_dataframe(){
     //loop over all reconstructed showers, counting signal and background
     cout<<"Total number of showers "<< ntotalshowers<<endl;
     for (int ishower = startshowerevent; ishower < startshowerevent + ntotalshowers; ishower++){
-      cout<<"Arrived at shower "<<MCEventID<<endl;
       MCEventID = ishower;
+      cout<<"Arrived at shower "<<MCEventID<<endl;
       //getting the input dataframe for that event
       auto df0 = df.Filter(Form("Ishower==%i",MCEventID));
       auto nsignaldf = df0.Filter("Signal==1").Count();
@@ -158,8 +163,17 @@ void efficiency(){
   const int startshowerevent = 720;
   const int endshowerevent = 1080;
   const int ntotalshowers = endshowerevent - startshowerevent;
+  //total signal and background from ttree
+  TFile *inputfile = TFile::Open("Final_dataset_RUN3_3_nsigbkg.root");
+  TTree *expectedshowers = (TTree*) inputfile->Get("expectedshowers");
+  int nsignal, nbackground;
+  //build index with event
+  expectedshowers->BuildIndex("MCEventID");
+  //set  addresses
+  expectedshowers->SetBranchAddress("nsignal",&nsignal);
+  expectedshowers->SetBranchAddress("nbackground",&nbackground);
+  
   //loop over all reconstructed showers, evaluating efficiencies
-  ROOT::RDataFrame df = ROOT::RDF::MakeCsvDataFrame("Final_dataset_RUN3_3.csv");
   TFile *showerfile = TFile::Open("shower1.root");
   TTree *treebranch = (TTree*) showerfile->Get("treebranch");
 
@@ -185,7 +199,6 @@ void efficiency(){
   treebranch->BuildIndex("ntrace1simub[0]");
   cout<<"Stored showers "<<nshowers<<" over "<< ntotalshowers<<endl;
   for (int MCEventID = startshowerevent; MCEventID < startshowerevent + ntotalshowers; MCEventID++){
-      cout<<"Arrived at shower "<<MCEventID<<endl;
       int nsignalselected = 0;
       int nbackgroundselected = 0;
       int showerindex = treebranch->GetEntryNumberWithIndex(MCEventID);
@@ -199,13 +212,13 @@ void efficiency(){
        }
       }
       //getting the input dataframe for that event
-      auto df0 = df.Filter(Form("Ishower==%i",MCEventID));
-      auto nsignal = df0.Filter("Signal==1").Count();
-      auto nbackground = df0.Filter("Signal==0").Count();
+      int ishower = expectedshowers->GetEntryNumberWithIndex(MCEventID);
+      if (ishower >= 0) expectedshowers->GetEntry(ishower);
+      else cout<<"ERROR: not found entry with tot signal and background! Check input file"<<endl;
 
       //filling efficiency/purity histograms
-      double efficiency = (double) nsignalselected/ *nsignal;
-      double backgroundrej = 1. - (double) nbackgroundselected/ *nbackground;
+      double efficiency = (double) nsignalselected/ nsignal;
+      double backgroundrej = 1. - (double) nbackgroundselected/ nbackground;
 
       heff->Fill(efficiency);
       hbakrej->Fill(backgroundrej);
@@ -217,8 +230,8 @@ void efficiency(){
       }
 
       //increasing total counters and moving to next event
-      ntotsignal += *nsignal;
-      ntotbackground += *nbackground;
+      ntotsignal += nsignal;
+      ntotbackground += nbackground;
       ntotsignalselected += nsignalselected;
       ntotbackgroundselected += nbackgroundselected;
   }
