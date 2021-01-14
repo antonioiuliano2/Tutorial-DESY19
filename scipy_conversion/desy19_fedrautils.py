@@ -269,3 +269,46 @@ def addtrackindex(df, trackfilename):
  #Now I need to merge them, however I want to keep all the segments, not only the ones which have been tracked. Luckily, there are many ways to do a merge (default is inner)
  dfwithtracks = df.merge(dftracks,how = 'left', on=["PID","ID"])
  return dfwithtracks
+
+def addvertexindex(df,vertexfilename):
+  '''adding vertex index to dataframe. Requires Track Index'''
+  vertexfile = r.TFile.Open(vertexfilename)
+  vertextree = vertexfile.Get("vtx")
+  
+  nvertices = vertextree.GetEntries()
+  #initial empty arrays, to be filled with segments from all tracks
+  #TrackIDall = np.zeros(0,dtype=int)
+  VertexS = {}
+  VertexE = {}
+
+  #start loop on vertices
+  for vtx in vertextree:
+  
+   vID = vtx.vID
+   ntracks = vtx.n
+   trackIDs = vtx.TrackID
+   trackedges = vtx.incoming
+   #start loop on tracks
+   for itrack in range(ntracks):
+    trackID = trackIDs[itrack]
+    #initial values, placeholder for vertex indexes
+    if trackID not in VertexS:
+     VertexS[trackID] = -1
+    if trackID not in VertexE:
+     VertexE[trackID] = -1
+    #filling tracks
+    if (trackedges[itrack] == 0):
+     VertexE[trackID] = vID
+    else:
+     VertexS[trackID] = vID
+
+  #getting array with all tracks
+  labels = ["FEDRATrackID","VertexS","VertexE"]
+  TrackIDarr = list(VertexS.keys())
+  VertexSarr = list(VertexS.values())
+  VertexEarr = list(VertexE.values())
+  dfvertices = pd.DataFrame({"FEDRATrackID":TrackIDarr, "VertexS":VertexSarr, "VertexE":VertexEarr},columns = labels, dtype = int)
+  
+  #dfwithvertices = df.merge(dfvertices,how='left', on = ["TrackID"])
+
+  return dfvertices  
