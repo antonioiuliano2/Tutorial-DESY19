@@ -199,6 +199,9 @@ void efficiency(TString foldername = "dR250"){
   //start main loop 
   treebranch->BuildIndex("ntrace1simub[0]");
   cout<<"Stored showers "<<nshowers<<" over "<< ntotalshowers<<endl;
+
+  fstream performancefile("performance_standardreco.csv",fstream::out);
+  performancefile<<"MCEventID,Recall,Precision,Fscore"<<endl;
   for (int MCEventID = startshowerevent; MCEventID < startshowerevent + ntotalshowers; MCEventID++){
       int nsignalselected = 0;
       int nbackgroundselected = 0;
@@ -223,16 +226,23 @@ void efficiency(TString foldername = "dR250"){
 
       heff->Fill(efficiency);
       hbakrej->Fill(backgroundrej);
-      hfscore->Fill(2*efficiency*backgroundrej/(efficiency+backgroundrej));
+
+      double purity;
 
       //purity has not sense if shower is not found
       if (showerindex >= 0){
-          double purity = (double) nsignalselected/sizeb;
-          hpurity->Fill(purity);
+          purity = (double) nsignalselected/sizeb;
       }
       else{
-          hpurity->Fill(0);
+          purity = 0.;
       } 
+      hpurity->Fill(purity);
+
+      double fscore = 2*efficiency*purity/(efficiency+purity);
+      if (efficiency == 0. && purity == 0.) fscore = 0.;
+      hfscore->Fill(fscore);
+      performancefile << MCEventID<<","<<efficiency << "," << purity << "," << fscore<< endl;
+
 
       //increasing total counters and moving to next event
       ntotsignal += nsignal;
@@ -271,6 +281,7 @@ void efficiency(TString foldername = "dR250"){
   cout<<"Mean purity "<<meanpurity <<" with error"<<errpurity<<endl;
   cout<<"Mean fscore "<<meanfscore<<" with error"<<errfscore<<endl;
 
+  performancefile.close();
 }
 
 void drawefficiencies(){

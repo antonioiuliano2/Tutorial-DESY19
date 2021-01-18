@@ -9,6 +9,11 @@ hmlprecision = mariadf.Histo1D(("hmlprecision","Precision from Random Forest;Pre
 hmlrecall = mariadf.Histo1D(("hmlrecall","Recall from Random Forest;Recall",25,0,1),"Recall")
 hmlfscore = mariadf.Histo1D(("hmlfscore","F_score from Random Forest;F_score",25,0,1),"F_score")
 
+#standardf = r.RDF.MakeCsvDataFrame("performance_standard_reco.csv")
+#hstandardprecision = standardf.Histo1D(("hstandardprecision","Precision from standard reconstruction;Precision",25,0,1),"Precision")
+#hstandardrecall = standardf.Histo1D(("hstandardrecall","Recall from standard reconstruction;Recall",25,0,1),"Recall")
+#hstandardfscore = standardf.Histo1D(("hstandarddf","F_score from standard reconstruction;F_score",25,0,1),"F_score")
+
 #getting standard precision and recall histograms
 
 standardfile = r.TFile.Open("performance_standard_reco.root")
