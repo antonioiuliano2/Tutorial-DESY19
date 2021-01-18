@@ -50,7 +50,7 @@ void doshowerreco(){
 
           double ConeRadius = 1000;
           double ConeAngle = 0.04;
-          double ConnectionDR = 250;
+          double ConnectionDR = 150;
           double ConnectionDT = 0.15;
           int NPropagation = 3;
 
@@ -158,7 +158,7 @@ vector<double> eff_formula(int foundevents, int totalevents){
   return efficiency;
 }
 
-void efficiency(){
+void efficiency(TString foldername = "dR250"){
   //in Maria's dataset she kept conting events from previous datasets, this then does not start from 0
   const int startshowerevent = 720;
   const int endshowerevent = 1080;
@@ -174,7 +174,7 @@ void efficiency(){
   expectedshowers->SetBranchAddress("nbackground",&nbackground);
   
   //loop over all reconstructed showers, evaluating efficiencies
-  TFile *showerfile = TFile::Open("shower1.root");
+  TFile *showerfile = TFile::Open(foldername+"/shower1.root");
   TTree *treebranch = (TTree*) showerfile->Get("treebranch");
 
   //set branches
@@ -186,9 +186,10 @@ void efficiency(){
   int nshowers = treebranch->GetEntries();
 
   //histograms to be filled
-  TH1F *heff = new TH1F("heff","Efficiency",10,0,1);
-  TH1F *hbakrej = new TH1F("hbakrej","Background rejction",10,0,1);
-  TH1F *hpurity = new TH1F("hpurity","Purity",10,0,1);
+  TH1F *heff = new TH1F("heff","Efficiency",25,0,1);
+  TH1F *hbakrej = new TH1F("hbakrej","Background rejction",25,0,1);
+  TH1F *hpurity = new TH1F("hpurity","Purity",25,0,1);
+  TH1F *hfscore = new TH1F("hfscore","F-Score",25,0,1);
 
   //total counters (over all showers)
   int ntotsignalselected = 0;
@@ -222,12 +223,16 @@ void efficiency(){
 
       heff->Fill(efficiency);
       hbakrej->Fill(backgroundrej);
+      hfscore->Fill(2*efficiency*backgroundrej/(efficiency+backgroundrej));
 
       //purity has not sense if shower is not found
       if (showerindex >= 0){
           double purity = (double) nsignalselected/sizeb;
           hpurity->Fill(purity);
       }
+      else{
+          hpurity->Fill(0);
+      } 
 
       //increasing total counters and moving to next event
       ntotsignal += nsignal;
@@ -251,5 +256,47 @@ void efficiency(){
   hbakrej->Draw();
   TCanvas *cpurity = new TCanvas();
   hpurity->Draw();
+  TCanvas *cfscore = new TCanvas();
+  hfscore->Draw();
+
+  double meaneff = heff->GetMean();
+  double meanpurity = hpurity->GetMean();
+  double meanfscore = hfscore->GetMean();
+
+  double erreff = heff->GetStdDev()/TMath::Sqrt(heff->GetEntries());
+  double errpurity = hpurity->GetStdDev()/TMath::Sqrt(hpurity->GetEntries());
+  double errfscore = hfscore->GetStdDev()/TMath::Sqrt(hfscore->GetEntries());
+
+  cout<<"Mean efficiency "<<meaneff <<" with error"<<erreff<<endl;
+  cout<<"Mean purity "<<meanpurity <<" with error"<<errpurity<<endl;
+  cout<<"Mean fscore "<<meanfscore<<" with error"<<errfscore<<endl;
+
+}
+
+void drawefficiencies(){
+   //draw efficiencies stored in tables (X Y EY)
+   //from input file, format "%lg %lg %lg" for no error in x, see ROOT TGraphError reference
+   TGraphErrors * effgraph = new TGraphErrors("eff_table.dat","%lg %lg %lg"); 
+   TGraphErrors * bkgrejgraph = new TGraphErrors("bkgrej_table.dat","%lg %lg %lg");
+   TGraphErrors * puritygraph = new TGraphErrors("purity_table.dat","%lg %lg %lg");
+
+   TCanvas *graphs = new TCanvas();
+   effgraph->SetTitle("Efficiency;dR[#mum];%");
+   effgraph->SetMarkerColor(kRed);
+   effgraph->SetMarkerStyle(kFullCircle);
+   effgraph->GetYaxis()->SetRangeUser(0,100);
+   effgraph->Draw("AP");
+
+   bkgrejgraph->SetTitle("Background Rejection");
+   bkgrejgraph->SetMarkerColor(kBlue);
+   bkgrejgraph->SetMarkerStyle(kFullStar);
+   bkgrejgraph->Draw("P");
+   
+   puritygraph->SetTitle("Purity");
+   puritygraph->SetMarkerColor(kBlack);
+   puritygraph->SetMarkerStyle(kFullSquare);
+   puritygraph->Draw("P");
+
+   graphs->BuildLegend();
 
 }
