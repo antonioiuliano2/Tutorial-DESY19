@@ -2,7 +2,7 @@
 //nplates: number of PASSIVE plates (i.e. 28 for RUN3)
 void depth_shower(int nplates){
  //accessing shower file
-    TFile *showerfile = TFile::Open("Shower.root");
+    TFile *showerfile = TFile::Open("shower1.root");
     TTree *showertree = (TTree*) showerfile->Get("treebranch");
 
     const int material = 1;//0 is lead, 1 is W
