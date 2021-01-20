@@ -169,10 +169,10 @@ void shower_reconstruction()
          }   
 }
 
-void drawshower(int whichshower = -1, int nplates = 29, bool isEDA = false){
+void drawshower(int whichshower = -1, int nplates = 29, bool isEDA = true){
     //drawing shower with entry ishower. If not provided, draw all showers according to selection
-    TCut cutentries = "sizeb>82&&output30>0.9";
-    TFile *showerfile = TFile::Open("Shower.root");
+    TCut cutentries = "sizeb>60";
+    TFile *showerfile = TFile::Open("shower1.root");
     TTree *showertree = (TTree*) showerfile->Get("treebranch");
 
     int sizeb; 
