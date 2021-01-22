@@ -35,7 +35,9 @@ for (int ienergy = 0; ienergy < nenergies; ienergy++){
  //profile histogram
  TProfile *shower_Esize = new TProfile("shower_Esize","Calibration of shower energy measurement;E[GeV];sizeb",100,0,10,0,300);
  TProfile *shower_sizeE = new TProfile("shower_sizeE","Calibration of shower energy measurement;sizeb;E[GeV]",30,0,300,0,10);
- TH1D *hres = new TH1D("hres","Energy resolution;#DeltaE/E",10,-1.05,0.95);
+ TH1D *hres[nenergies];
+ for (int ienergy = 0; ienergy < nenergies; ienergy++)
+  hres[ienergy] = new TH1D(TString::Format("hres[%i]",ienergy),TString::Format("Energy resolution for energy %i GeV;#DeltaE/E",ienergy+1),30,-1.5,1.5);
  TH2D *hEtrueErec = new TH2D("hEtrueErec","Erec vs Etrue;Etrue[GeV/c];Erec[GeV/c]", 100,0,10,100,0,10);
  
  //starting loop
@@ -66,6 +68,7 @@ for (int ienergy = 0; ienergy < nenergies; ienergy++){
  float intercept = calfunc->GetParameter(0);
  float slope = calfunc->GetParameter(1);
  float Erec, Eres;
+ int intenergy; //energy approximated to int (lower)
 
  const int nentriesres = showerchain->GetEntries() - nentriesfit;
  cout<<"TOTAL ENTRIES FOR ESTIMATION OF RESOLUTION"<<nentriesres<<endl;
@@ -74,23 +77,54 @@ for (int ienergy = 0; ienergy < nenergies; ienergy++){
 
  for (int ishower = nentriesfit; ishower < (nentriesfit+nentriesres);ishower++){
   showerchain->GetEntry(ishower);
-  if (sizeb > 50 && sizeb < 180) {
+  //if (sizeb > 50 && sizeb < 180) {
+  if (sizeb > 50) {
    showerenergy = TMath::Sqrt(P[0]*P[0] + emass * emass);
 
    Erec = sizeb * slope + intercept;
    Eres = (Erec - showerenergy)/showerenergy;
 
-   hres->Fill(Eres);
+   int intenergy = TMath::Nint	(showerenergy);
+   if (intenergy > 0) intenergy = intenergy - 1; //from 0 to 9, energies from 1 to 10	
+
+
+   if(intenergy >= 0 && intenergy < 10) hres[intenergy]->Fill(Eres);
    hEtrueErec->Fill(showerenergy,Erec);
   }
  }
 
- //drawing plots and fitting resolution
- TCanvas * cres = new TCanvas();
- hres->Draw();
- hres->Fit("gaus");
+ //drawing plots and fitting resolution, producing graph
+ TCanvas *cres[nenergies];
+ TF1 *gausfit[nenergies];
+ TGraphErrors *resgraph = new TGraphErrors();
+ for (int ienergy = 0; ienergy < nenergies; ienergy++){
+  //defining the function
+  gausfit[ienergy] = new TF1(TString::Format("gausfit[%i]",ienergy),"gaus",-1.5,1.5);
+  gausfit[ienergy]->SetParameters(0,0.25);
+
+  cres[ienergy] = new TCanvas();
+  hres[ienergy]->Draw();
+  hres[ienergy]->Fit(gausfit[ienergy]);
+
+  if (hres[ienergy]->GetEntries() > 0){
+
+   //adding fit results to graph
+   resgraph->SetPoint(ienergy,ienergy+1,gausfit[ienergy]->GetParameter(2));
+   resgraph->SetPointError(ienergy,0,gausfit[ienergy]->GetParError(2));
+  }
+ }
 
  TCanvas *c2D = new TCanvas();
  hEtrueErec->Draw("COLZ");
+
+ TCanvas *cgraph = new TCanvas();
+ resgraph->SetTitle("Energy resolution vs energy;E[GeV];#DeltaE/E");
+ resgraph->Draw("AP*");
+
+ TF1 *resfunction = new TF1("resfunction","sqrt(pow([0]/sqrt(x),2)+pow([1],2))");
+ resfunction->SetParameters(0.665,0.014);
+ resgraph->Fit(resfunction,"","",3,10);
+
+ gStyle->SetOptFit(1011);
 
 }
