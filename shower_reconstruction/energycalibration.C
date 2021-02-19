@@ -1,4 +1,51 @@
 //check molteplicity of reconstructed sim showers
+vector<double> eff_formula(int found, int total){
+  vector<double> efficiency; //value and error
+  
+  efficiency.push_back((double) found/total);
+  double efferr = TMath::Sqrt(efficiency[0] * (1- efficiency[0])/total);
+  efficiency.push_back(efferr);
+  
+  return efficiency;
+  
+}
+void electronscut(){
+  const int nsims = 2;
+
+  const int minsize = 10;
+  const int maxsize = 110;
+  const int sizestep = 10;
+  const int ncuts = (int) (maxsize - minsize)/sizestep;
+  int sizecut = minsize;
+
+  TGraphErrors *gcut = new TGraphErrors();
+
+  TString prepath_res = "/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/runs_360events/";
+  TString foldernames[nsims] = {"RUN3_differentenergies_17_December_2020/6GeV","RUN3_differentenergiestest_18_December_2020/6GeV"};
+  TString subpath("/b000003/shower1.root");
+
+  TChain *showerchain = new TChain("treebranch");
+  //get trees
+  for (int isim = 0; isim < nsims; isim++){
+  showerchain->Add((prepath_res+foldernames[isim]+subpath).Data());
+  }
+  //building a dataframe with the chain
+  ROOT::RDataFrame df(*showerchain);
+  auto nshowers = df.Count();
+  for (int icut = 0; icut<ncuts; icut++){
+   auto ngoods = df.Filter(Form("sizeb>=%i",sizecut)).Count();
+   vector<double> efficiency = eff_formula(*ngoods,*nshowers);
+   gcut->SetPoint(icut, sizecut, efficiency[0]);
+   gcut->SetPointError(icut,0,efficiency[1]);
+   cout<<"At cut "<<sizecut<<"how many shower good ?"<<*ngoods<<" over "<<*nshowers<<" ratio: "<<efficiency[0]<<"pm : "<<efficiency[1]<<endl;
+   sizecut = sizecut + sizestep;
+  }
+  gcut->SetMarkerStyle(kFullCircle);
+  gcut->SetMarkerColor(kRed);
+  gcut->Draw("AP");
+
+}
+
 void energycalibration(){
 
  const int nenergies = 10;
