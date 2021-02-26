@@ -3,6 +3,7 @@
 //Only thefirst time: launch countsignal_dataframe() to store number of initial signal and bacgkround from each event in a TTree
 //Launch each shower reconstruction with doshowerrec()
 //Evaluate efficiency and background rejections (Recalls for signal and background) with efficiency()
+//draw with drawefficiencies()
 EdbPVRec* DataframePVRec_converter(){
     EdbPVRec *gAli = new EdbPVRec();
 
