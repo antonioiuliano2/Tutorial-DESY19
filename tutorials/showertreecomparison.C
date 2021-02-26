@@ -37,8 +37,8 @@ ROOT::RDF::RInterface<ROOT::Detail::RDF::RJittedFilter, void> showerdataframe(TS
 }
 
 void showertreecomparison(){
-    auto datadf = showerdataframe("/home/utente/Lavoro/DE19_R7/recoshower_5_December_2020/shower1.root");
-    auto simdf = showerdataframe("/home/utente/Simulations/RUN7_28_December_2020/b000007/shower1.root");
+    auto datadf = showerdataframe("/eos/experiment/ship/data/DESY19TB/DE19_R7/recoshower_5_December_2020/shower1.root");
+    auto simdf = showerdataframe("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/runs_360events/RUN7_28_December_2020/b000007/shower1.root");
 
     auto hdata_IP = datadf.Histo1D({"hdata_IP","Data;IP/#DeltaZ",30,0.,0.3},"normIP");
     auto hdata_thetaproj = datadf.Histo1D({"hdata_thetaproj","Data;#theta'_{bt}[rad]",50,0,0.05},"thetaproj");
