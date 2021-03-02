@@ -72,70 +72,88 @@ figeff,axeff = plt.subplots()
 axeff.plot(karray,foundeff,"bo",label="efficiency")
 axeff.plot(karray,foundrej,"ro", label="backgroundrej")
 
+axeff.set_xlabel("line slope")
+axeff.set_ylabel("fraction of events")
+axeff.legend()
+
 #we need cmin=1 to hide empty bins like ROOT hists
 figtest_2d, (axtest_2d_s,axtest_2d_b) = plt.subplots(1,2)
 
-signalpid= nplates - 1 * dfsignal["PID"]
-backgroundpid =nplates - 1 * dfbackground["PID"]
-
-histest_2d_s = axtest_2d_s.hist2d(nplates - 1 * dfsignaltest["PID"], dfsignaltest["theta"], label = "Signal",bins=[nplates,100],range=[[0,nplates],[0,1.]],cmin=1)
-histest_2d_b = axtest_2d_b.hist2d(nplates - 1 * dfbackgroundtest["PID"], dfbackgroundtest["theta"], label = "Background",bins=[nplates,100],range=[[0,nplates],[0,1.]],cmin=1)
-axtest_2d_s.set_xlabel("PID")
-axtest_2d_s.set_ylabel("theta angle [rad]")
-axtest_2d_b.set_xlabel("PID")
-axtest_2d_b.set_ylabel("theta angle [rad]")
+histtest_2d_s = axtest_2d_s.hist2d(nplates - 1 * dfsignaltest["PID"], dfsignaltest["theta"], label = "Signal",bins=[nplates+1,100],range=[[0,nplates+1],[0,1.]],cmin=1)
+histtest_2d_b = axtest_2d_b.hist2d(nplates - 1 * dfbackgroundtest["PID"], dfbackgroundtest["theta"], label = "Background",bins=[nplates+1,100],range=[[0,nplates+1],[0,1.]],cmin=1)
+axtest_2d_s.set_title("Signal")
+axtest_2d_s.set_xlabel("{}-PID".format(nplates))
+axtest_2d_s.set_ylabel(r"$\theta$ angle [rad]")
+axtest_2d_b.set_title("Background")
+axtest_2d_b.set_xlabel("{}-PID".format(nplates))
+axtest_2d_b.set_ylabel(r"$\theta$ angle [rad]")
 
 #adding lines
-figtest_2d_s.colorbar(histtest_2d_s[3],ax = ax0_2d_s)
-axtest_2d_s.plot([0,nplates],[0,kmin * nplates],"k--",label="k = {}".format(kmin))
-axtest_2d_s.plot([0,nplates],[0,kmax * nplates],"r--",label="k = {}".format(kmax))
-axtest_2d_s.plot([0,nplates],[0,cutvalue * nplates],"b",label="k = {}".format(cutvalue))
-figtest_2d_b.colorbar(histtest_2d_b[3],ax = ax0_2d_b)
-axtest_2d_b.plot([0,nplates],[0,kmin * nplates],"k--",label="k = {}".format(kmin))
-axtest_2d_b.plot([0,nplates],[0,kmax * nplates],"r--",label="k = {}".format(kmax))
-axtest_2d_b.plot([0,nplates],[0,cutvalue * nplates],"b",label="k = {}".format(cutvalue))
+figtest_2d.colorbar(histtest_2d_s[3],ax = axtest_2d_s)
+figtest_2d.colorbar(histtest_2d_b[3],ax = axtest_2d_b)
+'''
+axtest_2d_s.plot([0,nplates+1],[0,kmin * (nplates+1)],"k--",label="k = {}".format(kmin))
+axtest_2d_s.plot([0,nplates+1],[0,kmax * (nplates+1)],"r--",label="k = {}".format(kmax))
+axtest_2d_s.plot([0,nplates+1],[0,cutvalue * (nplates+1)],"b",label="k = {}".format(cutvalue))
+
+axtest_2d_b.plot([0,nplates+1],[0,kmin * (nplates+1)],"k--",label="k = {}".format(kmin))
+axtest_2d_b.plot([0,nplates+1],[0,kmax * (nplates+1)],"r--",label="k = {}".format(kmax))
+axtest_2d_b.plot([0,nplates+1],[0,cutvalue * (nplates+1)],"b",label="k = {}".format(cutvalue))
 
 axtest_2d_s.legend()
+axtest_2d_b.legend()
+'''''
 #we need cmin=1 to hide empty bins like ROOT hists
 fig0_2d, (ax0_2d_s,ax0_2d_b) = plt.subplots(1,2)
 
-hist0_2d_s = ax0_2d_s.hist2d(signalpid, df.query("Signal==1")["theta"], label = "Signal",bins=[nplates,100],range=[[0,nplates],[0,1.]],cmin=1)
-hist0_2d_b = ax0_2d_b.hist2d(backgroundpid, df.query("Signal==0")["theta"], label = "Background",bins=[nplates,100],range=[[0,nplates],[0,1.]],cmin=1)
+hist0_2d_s = ax0_2d_s.hist2d(nplates - 1 * dfsignal["PID"], df.query("Signal==1")["theta"], label = "Signal",bins=[nplates+1,100],range=[[0,nplates+1],[0,1.]],cmin=1)
+hist0_2d_b = ax0_2d_b.hist2d(nplates - 1 * dfbackground["PID"], df.query("Signal==0")["theta"], label = "Background",bins=[nplates+1,100],range=[[0,nplates+1],[0,1.]],cmin=1)
 
-ax0_2d_s.set_xlabel("PID")
-ax0_2d_s.set_ylabel("theta angle [rad]")
-ax0_2d_b.set_xlabel("PID")
-ax0_2d_b.set_ylabel("theta angle [rad]")
+ax0_2d_s.set_title("Signal")
+ax0_2d_s.set_xlabel("{}-PID".format(nplates))
+ax0_2d_s.set_ylabel(r"$\theta$ angle [rad]")
+ax0_2d_b.set_title("Background")
+ax0_2d_b.set_xlabel("{}-PID".format(nplates))
+ax0_2d_b.set_ylabel(r"$\theta$ angle [rad]")
 
 #adding lines
-fig0_2d_s.colorbar(hist0_2d_s[3],ax = ax0_2d_s)
-ax0_2d_s.plot([0,nplates],[0,kmin * nplates],"k--",label="k = {}".format(kmin))
-ax0_2d_s.plot([0,nplates],[0,kmax * nplates],"r--",label="k = {}".format(kmax))
-ax0_2d_s.plot([0,nplates],[0,cutvalue * nplates],"b",label="k = {}".format(cutvalue))
-fig0_2d_b.colorbar(hist0_2d_b[3],ax = ax0_2d_b)
-ax0_2d_b.plot([0,nplates],[0,kmin * nplates],"k--",label="k = {}".format(kmin))
-ax0_2d_b.plot([0,nplates],[0,kmax * nplates],"r--",label="k = {}".format(kmax))
-ax0_2d_b.plot([0,nplates],[0,cutvalue * nplates],"b",label="k = {}".format(cutvalue))
+fig0_2d.colorbar(hist0_2d_s[3],ax = ax0_2d_s)
+fig0_2d.colorbar(hist0_2d_b[3],ax = ax0_2d_b)
+'''
+ax0_2d_s.plot([0,nplates+1],[0,kmin * (nplates+1)],"k--",label="k = {}".format(kmin))
+ax0_2d_s.plot([0,nplates+1],[0,kmax * (nplates+1)],"r--",label="k = {}".format(kmax))
+ax0_2d_s.plot([0,nplates+1],[0,cutvalue * (nplates+1)],"b",label="k = {}".format(cutvalue))
+
+ax0_2d_b.plot([0,nplates+1],[0,kmin * (nplates+1)],"k--",label="k = {}".format(kmin))
+ax0_2d_b.plot([0,nplates+1],[0,kmax * (nplates+1)],"r--",label="k = {}".format(kmax))
+ax0_2d_b.plot([0,nplates+1],[0,cutvalue * (nplates+1)],"b",label="k = {}".format(cutvalue))
 
 ax0_2d_s.legend()
 ax0_2d_b.legend()
-
+'''
 #we need cmin=1 to hide empty bins like ROOT hists
 fig2d, (ax2d_s,ax2d_b) = plt.subplots(1,2)
-ax2d_s.hist2d(df.query("Signal==1")["theta"], df.query("Signal==1")["phi"], label = "Signal",bins=[100,300],range=[[0,1.],[-1.5,1.5]],cmin=1)
-ax2d_b.hist2d(df.query("Signal==0")["theta"], df.query("Signal==0")["phi"], label = "Background",bins=[100,300],range=[[0,1.],[-1.5,1.5]],cmin=1)
-ax2d_s.set_xlabel("$\theta$ angle [rad]")
+hist2d_s = ax2d_s.hist2d(df.query("Signal==1")["theta"], df.query("Signal==1")["phi"], label = "Signal",bins=[100,300],range=[[0,1.],[-1.5,1.5]],cmin=1)
+hist2d_b = ax2d_b.hist2d(df.query("Signal==0")["theta"], df.query("Signal==0")["phi"], label = "Background",bins=[100,300],range=[[0,1.],[-1.5,1.5]],cmin=1)
+ax2d_s.set_title("Signal")
+ax2d_s.set_xlabel(r"$\theta$ angle [rad]")
 ax2d_s.set_ylabel("$\phi$ angle [rad]")
-ax2d_b.set_xlabel("$\theta$ angle [rad]")
+ax2d_b.set_title("Background")
+ax2d_b.set_xlabel(r"$\theta$ angle [rad]")
 ax2d_b.set_ylabel("$\phi$ angle [rad]")
+
+fig2d.colorbar(hist2d_s[3], ax= ax2d_s)
+fig2d.colorbar(hist2d_b[3], ax= ax2d_b)
 
 fig0, (ax0,ax01) = plt.subplots(1,2)
 ax0.hist(df.query("Signal==1")["theta"], density = True, alpha = 0.5, label = "Signal",bins=100,range=[0,1])
 ax0.hist(df.query("Signal==0")["theta"], density = True, alpha = 0.5, label = "Background",bins=100,range=[0,1])
-ax0.set_xlabel("$\theta$ angle [rad]")
+ax0.set_xlabel(r"$\theta$ angle [rad]")
+ax0.set_ylabel(r"$\frac{bincontent}{Nevents * \Delta bin}$")
 ax01.hist(df.query("Signal==1")["phi"], density = True, alpha = 0.5, label = "Signal",bins=100,range=[-3,3])
 ax01.hist(df.query("Signal==0")["phi"], density = True, alpha = 0.5, label = "Background",bins=100,range=[-3,3])
 ax01.set_xlabel("$\phi$ angle [rad]")
+ax01.set_ylabel(r"$\frac{bincontent}{Nevents * \Delta bin}$")
 
 ax0.legend()
 ax01.legend()

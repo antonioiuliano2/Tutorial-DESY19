@@ -83,6 +83,8 @@ for Rpoint in Rlist:
      #reading shower from that folder
      efficiency, purity = readshower(Rpoint,alphapoint,ntruesim)
      effgraph.SetPoint(point, alphapoint, Rpoint, efficiency[0])
+     if (Rpoint==1000 and alphapoint==0.04):
+       print("For Rmax {} and alpha {} we have efficiency {} and purity {}".format(Rpoint,alphapoint,efficiency,purity))
      puritygraph.SetPoint(point, alphapoint, Rpoint, purity[0])
      point = point + 1
 c0 = r.TCanvas()
