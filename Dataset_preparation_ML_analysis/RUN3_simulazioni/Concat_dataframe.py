@@ -20,7 +20,7 @@ for shower in MCEvent:
     dftot = pd.concat([dftot, df])
 
 for j in MCEvent:
-   if  dfr.query('Ishower=={}'.format(j)).empty:
+   if  dftot.query('Ishower=={}'.format(j)).empty:
        print(j)    
 
 dftot.to_csv('/home/mdeluca/dataset/RUN3/Theta/Dataset_tagli.csv')
@@ -36,7 +36,7 @@ for shower in MCEvent:
     dftot = pd.concat([dftot, df])
 
 for j in MCEvent:
-   if  dfr.query('Ishower=={}'.format(j)).empty:
+   if  dftot.query('Ishower=={}'.format(j)).empty:
        print(j)    
 
 dftot.to_csv('/home/mdeluca/dataset/RUN3/RUN3/Event/Final_dataset_RUN3.csv')
