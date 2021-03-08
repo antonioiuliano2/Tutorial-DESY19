@@ -26,6 +26,13 @@ from matplotlib.patches import Rectangle
 from copy import copy
 from collections import OrderedDict
 
+'''
+   it builds rectangles of increasing dimensions (pyramid)
+   
+   before launching it, please make a empty directory Rect_crescenti
+   it will fill this folder with a file for each shower
+'''
+
 f1 = figure(figsize=(12.5, 7))
 ax1 = f1.gca()
 

@@ -7,6 +7,12 @@ from collections import OrderedDict
 import seaborn as sns
 from copy import copy
 
+'''
+concatenates dataframes for all showers
+First part: after Theta and IP/DeltaZ selections
+Second part: after introducing dx, dy, dTX, dTY, after calling Ricerca_new.py
+'''
+
 # Unisce i dataset ottenuti dopo il taglio in Theta e in IP/DeltaZ#
 dftot = pd.DataFrame()
 dfu = pd.read_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv')

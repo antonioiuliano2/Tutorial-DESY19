@@ -7,6 +7,13 @@ from collections import OrderedDict
 import seaborn as sns
 import pickle
 
+'''
+   Random forest application
+   It will not save algorithm (Pickle lines to be added)
+
+   Before launching it, please make a empty directory Random_Forest
+   it will fill this folder with a file for each shower
+'''
 
 #data1 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_1/Dataset_Parametro_Impatto/Final_dataset1.csv')
 #data2 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/SN_Knear/Final_dataset_RUN3_3.csv') #Final_dataset_RUN3_3_new.csv

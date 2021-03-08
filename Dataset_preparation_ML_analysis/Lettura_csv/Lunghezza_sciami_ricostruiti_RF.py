@@ -6,6 +6,10 @@ from matplotlib.pyplot import plot, scatter, draw, figure, show
 from scipy.optimize import curve_fit
 from matplotlib import colors
 
+'''
+   Group a simulation dataframe
+   with 11, 10, 01 and 00 classes
+'''
 
 p=1
 df = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Prediction.csv')

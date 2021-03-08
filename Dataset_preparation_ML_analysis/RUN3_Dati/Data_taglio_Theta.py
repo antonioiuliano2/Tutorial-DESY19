@@ -4,6 +4,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import plot, scatter, draw, figure, show
 
+'''
+It computes theta_bt - theta_e,
+            theta'_bt,
+            IP/DeltaZ
+
+DeltaT is theta_bt - theta_e
+Angolo_cono is theta'_bt
+
+It applies all the selections on these variables
+theta_bt - theta_e <= 0.6
+IP/DeltaZ <= 0.4
+
+'''
 
 X=[]
 Y = []
@@ -38,7 +51,7 @@ for ishower in Ishower:
     #dff = dff[0:0]
     #df = pd.read_csv("/home/chiara/Scrivania/Distanze/Event0/Dataset_rect{}_nuovo.csv".format(shower))
     #dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/New/Proj{}.csv'.format(ishower)) 
-    dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/New/Rect_crescentidata{}.csv'.format(ishower))
+    dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Rect_crescenti/Rect_crescentidata{}.csv'.format(ishower))
     del dfshower['Unnamed: 0'] 
     dfirst = dfefake.query('Ishower=={}'.format(ishower))
     PID_max = np.max(dfirst['PID'])
@@ -98,4 +111,4 @@ for ishower in Ishower:
 
 
     dfs = pd.concat([dfs, dfsignal1])
-    dfsignal1.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/New/ThetaIP_btdata{}.csv'.format(ishower))
+    dfsignal1.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Theta/ThetaIP_btdata{}.csv'.format(ishower))

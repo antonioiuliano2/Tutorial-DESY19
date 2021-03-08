@@ -9,6 +9,11 @@ from copy import copy
 import ROOT as R
 import root_numpy as rp
 
+'''
+Estimate energy resolution, knowing the function,
+with a gaussian on Erec - Etrue / Etrue
+
+'''
 
 dffinale_data = pd.read_csv('/home/mdeluca/dataset/RUN3/Random_Forest/Lunghezza_sciami_ric.csv')
 df = dffinale_data.query('Signal+BackSig>=50')

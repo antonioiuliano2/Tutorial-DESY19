@@ -3,6 +3,9 @@ import numpy as np
 import root_numpy as rp
 import pandas as pd
 
+'''
+   plot histograms
+'''
 p=7
 #df = pd.read_csv('/home/chiara/Scrivania/RUN3_energie/RUN3_{}GeV/Random_Forest/Prediction.csv'.format(p))
 dffinale = pd.read_csv('/home/chiara/Scrivania/RUN3_energie/RUN3_{}GeV/Random_Forest/Lunghezza_sciami_ric_{}GeV.csv'.format(p,p))

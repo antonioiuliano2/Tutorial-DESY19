@@ -26,6 +26,14 @@ from matplotlib.patches import Rectangle
 from copy import copy
 from collections import OrderedDict
 
+'''
+   first large selection in the transverse area
+   1 cm x 1 cm in the xy plane
+
+   before launching it, please make a empty directory Rect
+   it will fill this folder with a file for each shower
+
+'''
 
 dfefake = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Inizio_candidati_sciami.csv')
 print(dfefake)
@@ -41,8 +49,8 @@ dfproiezioni = pd.DataFrame()
 dfPID_successivo= pd.DataFrame()
 dfnoise_rect = pd.DataFrame()
 dfnoise_successivo = pd.DataFrame()
-#Ishower = np.unique(dfefake['Ishower'])
-Ishower = [n for n in range(19, 20)]
+Ishower = np.unique(dfefake['Ishower'])
+#Ishower = [n for n in range(19, 20)]
 
 for ishower in Ishower:
     print(ishower)
@@ -60,7 +68,7 @@ for ishower in Ishower:
     dfsciame_fake1 = dfsciame_fake.copy()
     dfsciame_fake1['Ishower'] = ishower
     df = pd.concat([dfsciame_fake1, dfishower])
-    df.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/New/Rect_data{}.csv'.format(ishower)) 
+    df.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Rect/Rect_data{}.csv'.format(ishower)) 
             
 
 

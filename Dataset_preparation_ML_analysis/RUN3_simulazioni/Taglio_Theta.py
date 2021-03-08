@@ -4,6 +4,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import plot, scatter, draw, figure, show
 
+'''
+It computes theta_bt - theta_e,
+            theta'_bt,
+            IP/DeltaZ
+
+DeltaT is theta_bt - theta_e
+Angolo_cono is theta'_bt
+
+It applies all the selections on these variables
+theta_bt - theta_e <= 0.6
+IP/DeltaZ <= 0.4
+
+'''
 
 X=[]
 Y = []

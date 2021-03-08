@@ -21,6 +21,11 @@ from collections import OrderedDict
 import pandas as pd
 import numpy as np
 
+'''
+   Apply projections over real data
+   it should use dZ from alignment data (see commented section)
+
+'''
 
 dZ = 1315
 dfsignal = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/RUN3data.csv')

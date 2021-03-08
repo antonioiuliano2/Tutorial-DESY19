@@ -25,8 +25,9 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from copy import copy
 
-
-#Punto di inizio dello sciame#
+'''
+   definisce il punto di inizio dello sciame e gli altri segmenti associati
+'''
 
 dfevent = pd.read_csv('/home/mdeluca/dataset/RUN3/Proiezioni_RUN3.csv')
 del dfevent['Unnamed: 0']
@@ -132,7 +133,9 @@ for shower in MCEvent:
         dfn = pd.concat([dfsciame, dfn])
     dfq = pd.concat([dfn, dfq])
     dfu = dfp
+#remaining of shower
 dfq.to_csv('/home/mdeluca/dataset/RUN3/PID_ric_RUN3.csv')
+#shower injectors
 dfu.to_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv')    
     #dfq = pd.concat()
 

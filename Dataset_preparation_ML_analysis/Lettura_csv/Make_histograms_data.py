@@ -9,12 +9,13 @@ histofile = r.TFile("/home/utente/Lavoro/DE19_R3/RUN3_RandomForest_histos.root",
 #importing csv file in a dataframe, taking segments classified as true
 
 datadf = pd.read_csv("/home/utente/Lavoro/DE19_R3/Dati_nuovo.csv")
+datadf = datadf[datadf["DeltaT"].isna()==False] 
 signaldf = datadf.query("Y_pred_forest_data==1")
 
 #number of segments witin the same Ishower
 sizedataset = signaldf.groupby("Ishower").count()
 size = sizedataset["ID"].to_numpy()
-size = size + 1 #we need to include the injectors (not in this dataset)
+#size = size + 1 #we need to include the injectors (not in this dataset)
 goodshowers = sizedataset.query("ID>=50").index.to_numpy() #Ishower for showers with at least 50 segments
 
 gooddf = signaldf[signaldf["Ishower"].isin(goodshowers)]

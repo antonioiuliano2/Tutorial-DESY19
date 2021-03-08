@@ -31,3 +31,27 @@ The scripts need to be launched in the following order (Concat_dataframe.py is l
 8. Concat_dataframe.py
 
 9. Random_Forest_Ishower.py
+
+## Dataset preparation from data
+
+The scripts need to be launched in the following order (Concat_dataframe.py is launched twice):
+
+1. Proiezioni_Theta.py
+
+Between 1 and 2, produce "Inizio_candidati_sciami.csv"
+Segments with the same TrackID within first three plates with theta <= 50 mrad.
+Take last segment of the track
+
+2. Data_rect.py
+
+3. Data_rect_crescenti.py
+
+4. Data_taglio_Theta.py
+
+5. Concat_dataframe.py
+
+6. Ricerca_complete.py
+
+7. Concat_dataframe.py
+
+9. Random_Forest_Ishower.py

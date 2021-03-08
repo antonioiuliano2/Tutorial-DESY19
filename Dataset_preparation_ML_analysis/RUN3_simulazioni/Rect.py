@@ -26,6 +26,14 @@ from matplotlib.patches import Rectangle
 from copy import copy
 from collections import OrderedDict
 
+'''
+   first large selection in the transverse area
+   1 cm x 1 cm in the xy plane
+
+   before launching it, please make a empty directory Rect
+   it will fill this folder with a file for each shower
+
+'''
 
 dfe = pd.read_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv')
 #print(dfe)

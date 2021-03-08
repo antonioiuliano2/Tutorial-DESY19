@@ -21,6 +21,11 @@ from collections import OrderedDict
 import pandas as pd
 import numpy as np
 
+'''
+   Computing projections of positions in the next and previous plates
+   taking into account different dZ.
+   dZ is assumed to be the same 
+'''
 
 dZ = 1315
 dfsignal = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3.csv')

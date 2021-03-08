@@ -26,6 +26,13 @@ from matplotlib.patches import Rectangle
 from copy import copy
 from collections import OrderedDict
 
+'''
+   it builds rectangles of increasing dimensions (pyramid)
+   
+   before launching it, please make a empty directory
+   it will fill this folder with a file for each shower
+'''
+
 f1 = figure(figsize=(12.5, 7))
 ax1 = f1.gca()
 
@@ -53,7 +60,7 @@ y = int(input('Intercetta?'))
 for ishower in Ishower:
     print(ishower)
     #dfshower = pd.read_csv('/home/maria/Scrivania/TestRF/Rect_Fake{}.csv'.format(ishower))
-    dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/New/Rect_data{}.csv'.format(ishower)) 
+    dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Rect/Rect_data{}.csv'.format(ishower)) 
     del dfshower['Unnamed: 0'] 
 
     dfproiezioni = dfproiezioni[0:0]
@@ -97,7 +104,7 @@ for ishower in Ishower:
            dfcentrale1 = dfcentrale.copy()
        
            dft = pd.concat([dfPID_successivo1, dfcentrale1])
-           dft.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/New/Rect_crescentidata{}.csv'.format(ishower)) 
+           dft.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Rect_crescenti/Rect_crescentidata{}.csv'.format(ishower)) 
            
 
 

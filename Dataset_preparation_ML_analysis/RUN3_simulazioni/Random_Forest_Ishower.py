@@ -6,6 +6,13 @@ import collections
 from collections import OrderedDict
 import seaborn as sns
 
+'''
+   Random forest training and test components.
+   It will not save algorithm (Pickle lines to be added)
+
+   Before launching it, please make a empty directory Random_Forest
+   it will fill this folder with a file for each shower
+'''
 
 data1 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_2/Event/Final_dataset_RUN3_2.csv')  # RUN3_2 --> 2 dataset del RUN3
 data2 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Event/Final_dataset_RUN3_3.csv')  # RUN3_3 --> 3 dataset del RUN3
@@ -69,16 +76,16 @@ crf = classification_report(y_test, y_pred_forest)
 cmf = confusion_matrix(y_test, y_pred_forest)
 dforest = pd.DataFrame(cmf)
 print(dforest)
-#dforest.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Confusion_matrix1.csv')
-#ff = open('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Report_Forest1.txt', 'w')
-#ff.write('Title\n\nClassification Report\n\n{}'.format(crf))
-#ff.close()
+dforest.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Confusion_matrix1.csv')
+ff = open('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Report_Forest1.txt', 'w')
+ff.write('Title\n\nClassification Report\n\n{}'.format(crf))
+ff.close()
 dfnew = pd.DataFrame(classification_report(y_test, y_pred_forest, output_dict=True)).transpose()
 
 print('-----------------------------------------------')
 print('Classification Report')
 print(dfnew)
-#dfnew.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Classification_Report1.csv', index=True)
+dfnew.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Classification_Report1.csv', index=True)
 
 
 labels = ['Y_test','Y_pred_forest']
@@ -86,7 +93,7 @@ dfforest = pd.DataFrame({'Y_test':y_test, 'Y_pred_forest':y_pred_forest}, column
 
 dfresult = pd.DataFrame(X1.join(dfforest))
 print(dfresult)
-#dfresult.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Prediction.csv')
+dfresult.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Prediction.csv')
 
 
 

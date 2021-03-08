@@ -9,6 +9,13 @@ from matplotlib import colors
 import numpy as np
 #import root_numpy as rp
 
+'''
+   Main and longest part of the algorithm
+   Before launching it, please make a empty directory Event
+   it will fill this folder with a file for each shower
+
+'''
+
 #MCEvent = [n for n in range(360, 720)]
 
 MCEvent = [n for n in range(0,173)]
