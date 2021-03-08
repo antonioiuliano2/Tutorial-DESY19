@@ -39,7 +39,7 @@ ax2 = f2.gca()
 Lung = []
 #MCEvent = np.unique(dfevent['MCEvent'].values)
 MCEvent = [m for m in range(0, 360)]
-MCEvent.remove(57)
+#MCEvent.remove(57)
 PID = np.unique(dfevent['PID'].values)
 PID1 = []
 Lung[:] = []
