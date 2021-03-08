@@ -1,8 +1,16 @@
 # Machine Learning preparation and analysis codes
 
+## Introduction
+
 This folder contains the routine designed by Maria De Luca during her Master Thesis.
 
 A dataset containing the base-tracks for shower candidate is produced, then provided as input to a Random Forest classifier.
+
+There are two versions, one for simulation csv and the other for data csv
+
+Lettura_csv analyses the ML output and it produces histograms
+
+## Dataset preparation from simulation
 
 The scripts need to be launched in the following order (Concat_dataframe.py is launched twice):
 
@@ -23,7 +31,3 @@ The scripts need to be launched in the following order (Concat_dataframe.py is l
 8. Concat_dataframe.py
 
 9. Random_Forest_Ishower.py
-
-There are two versions, one for simulation csv and the other for data csv
-
-Lettura_csv analyses the ML output and it produces histograms
