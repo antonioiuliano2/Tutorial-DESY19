@@ -40,14 +40,14 @@ dfnoise_successivo = pd.DataFrame()
 dft = pd.DataFrame()
 
 
-dfe = pd.read_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv'.format(p,p))
+dfe = pd.read_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv')
 del dfe['Unnamed: 0']
 print(dfe)
 MCEvent = np.unique(dfe['MCEvent'].values)
 #MCEvent = [n for n in range(0,360)]
 
-i = int(input('Quanto vale i?'))
-y = int(input('Intercetta?'))
+i = int(input('Quanto vale i?')) # i = 140
+y = int(input('Quanto vale y?')) #y = 500
 #del dfe['Unnamed: 0']
 
 dfo = pd.DataFrame()
@@ -55,7 +55,7 @@ for ishower in MCEvent:
     print(ishower)
     #dfshower = pd.read_csv('/home/maria/Scrivania/TestRF/Rect_Fake{}.csv'.format(ishower))
     #dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Rect/Rect{}.csv'.format(ishower))
-    dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/Rect/Rect{}.csv'.format(p, ishower))
+    dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/Rect/Rect{}.csv'.format(ishower))
     del dfshower['Unnamed: 0'] 
 
     dfproiezioni = dfproiezioni[0:0]
@@ -105,7 +105,7 @@ for ishower in MCEvent:
            dfo = pd.concat([dft, dfy])
            #print(len(dfo))
            #dfo.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Rect_crescenti/Rect_crescenti{}.csv'.format(ishower))
-           dfo.to_csv('/home/mdeluca/dataset/RUN3/Rect_crescenti/Rect_crescenti{}.csv'.format(p, ishower))
+           dfo.to_csv('/home/mdeluca/dataset/RUN3/Rect_crescenti/Rect_crescenti{}.csv'.format(ishower))
 
 
 
