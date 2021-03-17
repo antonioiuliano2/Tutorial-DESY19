@@ -5,29 +5,35 @@ import xgboost
 import collections
 from collections import OrderedDict
 import seaborn as sns
-
+from argparse import ArgumentParser
 '''
    Random forest training and test components.
    It will not save algorithm (Pickle lines to be added)
 
    Before launching it, please make a empty directory Random_Forest
    it will fill this folder with a file for each shower
+   python Random_Forest_Ishower.py -id Event/Final_dataset_RUN6.csv -of Random_Forest
 '''
 
-data1 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_2/Event/Final_dataset_RUN3_2.csv')  # RUN3_2 --> 2 dataset del RUN3
-data2 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Event/Final_dataset_RUN3_3.csv')  # RUN3_3 --> 3 dataset del RUN3
+parser = ArgumentParser()
+parser.add_argument("-id","--inputdataset",dest="inputcsvdataset",help="folder to access input datasets",required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+options = parser.parse_args()
+
+data1 = pd.read_csv(options.inputcsvdataset)  # RUN3_2 --> 2 dataset del RUN3
+#data2 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Event/Final_dataset_RUN3_3.csv')  # RUN3_3 --> 3 dataset del RUN3
 
 del data1['Unnamed: 0']
-del data2['Unnamed: 0']
+#del data2['Unnamed: 0']
 
 y = data1.loc[:, 'Signal']
 X = data1.loc[:,['x','y','z','TX','TY','PID','X_Next','Y_Next','dx','P','Flag','MCTrack','dy','dTX','dTY','dR','dT','DeltaT','Par_impact_nor','Angolo_cono','MCEvent','Ishower']]
 
-X1 = data2.loc[:,['x','y','z','TX','TY','PID','X_Next','Y_Next','dx','P','Flag','MCTrack','dy','dTX','dTY','dR','dT','DeltaT','Par_impact_nor','Angolo_cono', 'MCEvent','Ishower']]
-y1 = data2.loc[:,'Signal']
+#X1 = data2.loc[:,['x','y','z','TX','TY','PID','X_Next','Y_Next','dx','P','Flag','MCTrack','dy','dTX','dTY','dR','dT','DeltaT','Par_impact_nor','Angolo_cono', 'MCEvent','Ishower']]
+#y1 = data2.loc[:,'Signal']
 
-#from sklearn.model_selection import train_test_split
-#X_trainMC, X_testMC, y_train, y_testMC = train_test_split(X,y, test_size=0.3, random_state=0, stratify=y)
+from sklearn.model_selection import train_test_split
+X_trainMC, X_testMC, y_train, y_test = train_test_split(X,y, test_size=0.3, random_state=0, stratify=y)
 
 #X_tot = X_testMC.append(X1)
 
@@ -35,11 +41,11 @@ y1 = data2.loc[:,'Signal']
 #y_test = y_testMC.append(y1)
 #X_train = X_trainMC.loc[:,['x','y','z','TX','TY','X_Next','Y_Next','dx','dy','dTX','dTY']]
 
-X_train = X.loc[:,['dx','dy','dTX','dTY','DeltaT', 'Par_impact_nor','Angolo_cono']]
-y_train = y
+X_train = X_trainMC.loc[:,['dx','dy','dTX','dTY','DeltaT', 'Par_impact_nor','Angolo_cono']]
+#y_train = y
 
-X_test = X1.loc[:,['dx','dy','dTX','dTY', 'DeltaT', 'Par_impact_nor','Angolo_cono']]
-y_test = y1
+X_test = X_testMC.loc[:,['dx','dy','dTX','dTY', 'DeltaT', 'Par_impact_nor','Angolo_cono']]
+#y_test = y1
 
 
 from sklearn.preprocessing import StandardScaler
@@ -76,8 +82,8 @@ crf = classification_report(y_test, y_pred_forest)
 cmf = confusion_matrix(y_test, y_pred_forest)
 dforest = pd.DataFrame(cmf)
 print(dforest)
-dforest.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Confusion_matrix1.csv')
-ff = open('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Report_Forest1.txt', 'w')
+dforest.to_csv(options.outputfolder+'/Confusion_matrix1.csv')
+ff = open(options.outputfolder+'/Report_Forest1.txt', 'w')
 ff.write('Title\n\nClassification Report\n\n{}'.format(crf))
 ff.close()
 dfnew = pd.DataFrame(classification_report(y_test, y_pred_forest, output_dict=True)).transpose()
@@ -85,15 +91,15 @@ dfnew = pd.DataFrame(classification_report(y_test, y_pred_forest, output_dict=Tr
 print('-----------------------------------------------')
 print('Classification Report')
 print(dfnew)
-dfnew.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Classification_Report1.csv', index=True)
+dfnew.to_csv(options.outputfolder+'/Classification_Report1.csv', index=True)
 
 
 labels = ['Y_test','Y_pred_forest']
 dfforest = pd.DataFrame({'Y_test':y_test, 'Y_pred_forest':y_pred_forest}, columns = labels)
 
-dfresult = pd.DataFrame(X1.join(dfforest))
+dfresult = pd.DataFrame(X_testMC.join(dfforest))
 print(dfresult)
-dfresult.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Random_Forest/Prediction.csv')
+dfresult.to_csv(options.outputfolder'/Prediction.csv')
 
 
 
