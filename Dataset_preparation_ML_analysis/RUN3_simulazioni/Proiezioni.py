@@ -20,15 +20,23 @@ from copy import copy
 from collections import OrderedDict
 import pandas as pd
 import numpy as np
+from argparse import ArgumentParser
 
 '''
    Computing projections of positions in the next and previous plates
    taking into account different dZ.
    dZ is assumed to be the same 
+   python Proiezioni.py -i RUN3.csv -o Proiezioni_RUN3.csv
 '''
 
+parser = ArgumentParser()
+parser.add_argument("-i","--input",dest="inputcsv",help="input dataset in csv format with simulation", required=True)
+parser.add_argument("-o","--output",dest="outputcsv",help="output dataset in csv format with projection", required=True)
+
+options = parser.parse_args()
+
 dZ = 1315
-dfsignal = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3.csv')
+dfsignal = pd.read_csv(options.inputcsv)
 print(dfsignal)
 X_Next = dfsignal['x'].values + dfsignal['TX'].values*dZ/2
 Y_Next = dfsignal['y'].values + dfsignal['TY'].values*dZ/2
@@ -54,4 +62,4 @@ dfsignal['Signal'] = 1
     
 print(dfsignal)
 
-dfsignal.to_csv('/home/mdeluca/dataset/RUN3/Proiezioni_RUN3.csv')
+dfsignal.to_csv(options.outputcsv)

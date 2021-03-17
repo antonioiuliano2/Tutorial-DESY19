@@ -25,6 +25,7 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from copy import copy
 from collections import OrderedDict
+from argparse import ArgumentParser
 
 '''
    first large selection in the transverse area
@@ -33,13 +34,24 @@ from collections import OrderedDict
    before launching it, please make a empty directory Rect
    it will fill this folder with a file for each shower
 
+   python Rect.py -n 10 -is Inizio_sciame_RUN3.csv -ir PID_ric_RUN3.csv -ib Noise_RUN3_Proiezioni_new.csv -of Rect
+
 '''
 
-dfe = pd.read_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv')
+parser = ArgumentParser()
+
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
+parser.add_argument("-ir","--inputremainder",dest="inputcsvremainder",help="input dataset in csv format with remainder of the shower", required=True)
+parser.add_argument("-ib","--inputbackground",dest="inputbackground",help="input dataset in csv format with background projections", required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+options = parser.parse_args()
+
+dfe = pd.read_csv(options.inputcsvstarters)
 #print(dfe)
 
-dfsignal = pd.read_csv('/home/mdeluca/dataset/RUN3/PID_ric_RUN3.csv')
-dfnoise = pd.read_csv('/home/mdeluca/dataset/RUN3/Noise_RUN3_proiezioni_new.csv')
+dfsignal = pd.read_csv(options.inputcsvremainder)
+dfnoise = pd.read_csv(options.inputbackground)
 #dftot = pd.read_csv('/home/mdeluca/dataset/RUN3_2/Data_Noise_RUN3_2.csv')
 #print(dfnoise)
 del dfe['Unnamed: 0']
@@ -60,7 +72,7 @@ dfnt = pd.DataFrame()
 MCEvent = np.unique(dfe['MCEvent'].values)
 
 
-for shower in MCEvent:
+def calcRect(shower):
     print(shower)
     dfelectron = dfe.query('MCEvent == {}'.format(shower))
     dfcentrale = dfelectron
@@ -81,4 +93,14 @@ for shower in MCEvent:
     dft1['Ishower'] = shower
     #print(len(dfst))
     #print(len(dfnt))
-    dft1.to_csv('/home/mdeluca/dataset/RUN3/Rect/Rect{}.csv'.format(shower))         
+    dft1.to_csv(options.outputfolder+('/Rect{}.csv'.format(shower)))         
+
+def calcallRects():
+ for shower in MCEvent:
+    calcRect(shower)
+
+#python Rect.py 11 makes all rectangles, otherwise only one
+if (int(options.nshower) >0):
+ calcRect(int(options.nshower))
+else:
+ calcallRects()

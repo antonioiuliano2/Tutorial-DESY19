@@ -25,13 +25,24 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from copy import copy
 from collections import OrderedDict
+from argparse import ArgumentParser
 
 '''
    it builds rectangles of increasing dimensions (pyramid)
    
    before launching it, please make a empty directory Rect_crescenti
    it will fill this folder with a file for each shower
+
+   python Rect_crescenti.py -n 10 -is Inizio_sciame_RUN3.csv -if Rect -of Rect_crescenti
 '''
+
+parser = ArgumentParser()
+
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
+parser.add_argument("-if","--inputfolder",dest="inputfolder",help="folder to access input datasets",required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+options = parser.parse_args()
 
 f1 = figure(figsize=(12.5, 7))
 ax1 = f1.gca()
@@ -47,7 +58,7 @@ dfnoise_successivo = pd.DataFrame()
 dft = pd.DataFrame()
 
 
-dfe = pd.read_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv')
+dfe = pd.read_csv(options.inputcsvstarters)
 del dfe['Unnamed: 0']
 print(dfe)
 MCEvent = np.unique(dfe['MCEvent'].values)
@@ -58,11 +69,11 @@ y = int(input('Quanto vale y?')) #y = 500
 #del dfe['Unnamed: 0']
 
 dfo = pd.DataFrame()
-for ishower in MCEvent:
+def calcRect(ishower):
     print(ishower)
     #dfshower = pd.read_csv('/home/maria/Scrivania/TestRF/Rect_Fake{}.csv'.format(ishower))
     #dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Rect/Rect{}.csv'.format(ishower))
-    dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/Rect/Rect{}.csv'.format(ishower))
+    dfshower = pd.read_csv(options.inputfolder+('/Rect{}.csv'.format(ishower)))
     del dfshower['Unnamed: 0'] 
 
     dfproiezioni = dfproiezioni[0:0]
@@ -112,7 +123,14 @@ for ishower in MCEvent:
            dfo = pd.concat([dft, dfy])
            #print(len(dfo))
            #dfo.to_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Rect_crescenti/Rect_crescenti{}.csv'.format(ishower))
-           dfo.to_csv('/home/mdeluca/dataset/RUN3/Rect_crescenti/Rect_crescenti{}.csv'.format(ishower))
+           dfo.to_csv(options.outputfolder+('/Rect_crescenti{}.csv'.format(ishower)))
 
+def calcallRects():
+ for shower in MCEvent:
+    calcRect(shower)
 
-
+#python Rect.py 11 makes all rectangles, otherwise only one
+if (int(options.nshower) >0):
+ calcRect(int(options.nshower))
+else:
+ calcallRects()

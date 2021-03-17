@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import plot, scatter, draw, figure, show
+from argparse import ArgumentParser
 
 '''
 It computes theta_bt - theta_e,
@@ -16,7 +17,16 @@ It applies all the selections on these variables
 theta_bt - theta_e <= 0.6
 IP/DeltaZ <= 0.4
 
+python Taglio_Theta.py -n 10 -is Inizio_sciame_RUN3.csv -if Rect_crescenti -of Theta
 '''
+
+parser = ArgumentParser()
+
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
+parser.add_argument("-if","--inputfolder",dest="inputfolder",help="folder to access input datasets",required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+options = parser.parse_args()
 
 X=[]
 Y = []
@@ -31,12 +41,12 @@ dfe = pd.DataFrame()
 dff = pd.DataFrame()
 dfg = pd.DataFrame()
 
-dfe = pd.read_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv')
+dfe = pd.read_csv(options.inputcsvstarters)
 #Ishower = [n for n in range(720, 721)]
 Ishower = np.unique(dfe['MCEvent'].values)
 #del dfefake['Unnamed: 0']
 
-for ishower in Ishower:
+def calcTheta(ishower):
     print(ishower)
     del X[:]
     del Y[:]
@@ -49,7 +59,7 @@ for ishower in Ishower:
     #dfe = dfe[0:0]
     #dff = dff[0:0]
     #df = pd.read_csv("/home/chiara/Scrivania/Distanze/Event0/Dataset_rect{}_nuovo.csv".format(shower))
-    df = pd.read_csv("/home/mdeluca/dataset/RUN3/Rect_crescenti/Rect_crescenti{}.csv".format(ishower))
+    df = pd.read_csv(options.inputfolder+('/Rect_crescenti{}.csv'.format(ishower)))
     del df['Unnamed: 0']
     dfshower = df.query('Signal==1')
     PID_max = np.max(dfshower['PID'])
@@ -110,4 +120,14 @@ for ishower in Ishower:
 
     dfu = pd.concat([dfu, dfsignal])
     #dfsignal = dfu
-    dfsignal1.to_csv('/home/mdeluca/dataset/RUN3/Theta/Thetabt_{}.csv'.format(ishower))
+    dfsignal1.to_csv(options.outputfolder+('/Thetabt_{}.csv'.format(ishower)))
+
+def calcallThetas():
+ for shower in MCEvent:
+    calcTheta(shower)
+
+#python Rect.py 11 makes all rectangles, otherwise only one
+if (int(options.nshower) >0):
+ calcTheta(int(options.nshower))
+else:
+ calcallThetas()

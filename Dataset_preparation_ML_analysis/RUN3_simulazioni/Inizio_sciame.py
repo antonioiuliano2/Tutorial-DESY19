@@ -24,12 +24,20 @@ import matplotlib.patches as mpatches
 from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from copy import copy
+from argparse import ArgumentParser
 
 '''
    definisce il punto di inizio dello sciame e gli altri segmenti associati
+   python Inizio_sciame.py -i Proiezioni_RUN3.csv -os Inizio_sciame_RUN3.csv -or PID_ric_RUN3.csv
 '''
 
-dfevent = pd.read_csv('/home/mdeluca/dataset/RUN3/Proiezioni_RUN3.csv')
+parser = ArgumentParser()
+parser.add_argument("-i","--input",dest="inputcsv",help="input dataset in csv format with projections", required=True)
+parser.add_argument("-os","--outputstarters",dest="outputcsvstarters",help="output dataset in csv format with shower injectors", required=True)
+parser.add_argument("-or","--outputremainder",dest="outputcsvremainder",help="output dataset in csv format with remainder of the shower", required=True)
+options = parser.parse_args()
+
+dfevent = pd.read_csv(options.inputcsv)
 del dfevent['Unnamed: 0']
 f1 = figure()
 ax1 = f1.gca()
@@ -134,9 +142,9 @@ for shower in MCEvent:
     dfq = pd.concat([dfn, dfq])
     dfu = dfp
 #remaining of shower
-dfq.to_csv('/home/mdeluca/dataset/RUN3/PID_ric_RUN3.csv')
+dfq.to_csv(options.outputcsvremainder)
 #shower injectors
-dfu.to_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv')    
+dfu.to_csv(options.outputcsvstarters)
     #dfq = pd.concat()
 
 
@@ -196,7 +204,7 @@ for shower in MC:
 
 
 '''
-df = pd.read_csv('/home/mdeluca/dataset/RUN3/Inizio_sciame_RUN3.csv')
+df = pd.read_csv(options.outputcsvstarters)
 f1 = figure(figsize=(13.5, 7.5))
 ax1 = f1.gca()
 

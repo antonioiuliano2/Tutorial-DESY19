@@ -7,6 +7,7 @@ from scipy.optimize import curve_fit
 from matplotlib import colors
 #import ROOT as R
 import numpy as np
+from argparse import ArgumentParser
 #import root_numpy as rp
 
 '''
@@ -14,12 +15,21 @@ import numpy as np
    Before launching it, please make a empty directory Event
    it will fill this folder with a file for each shower
 
+   python Ricerca_new.py -n 10 -is Inizio_sciame_RUN3.csv -it Dataset_tagli.csv -of Event
+
 '''
+parser = ArgumentParser()
+
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
+parser.add_argument("-it","--inputtheta",dest="inputcsvcuts",help="input dataset after cuts",required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+options = parser.parse_args()
 
 MCEvent = [n for n in range(0, 360)]
 
-dfinizio = pd.read_csv('/home/mdeluca/dataset/Inizio_sciame_RUN3.csv')
-df = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3/Theta/Dataset_tagli.csv')
+dfinizio = pd.read_csv(options.inputcsvstarters)
+df = pd.read_csv(options.inputcsvcuts)
 del dfinizio['Unnamed: 0']
 del df['Unnamed: 0']
 
@@ -40,7 +50,7 @@ da = pd.DataFrame()
 dfu = pd.DataFrame()
 dfl = pd.DataFrame()
 
-for shower in MCEvent:
+def findShower(shower):
     dh = dh[0:0]
     du = du[0:0]
     do = du[0:0]
@@ -226,7 +236,17 @@ for shower in MCEvent:
          do = pd.concat([do, dfb], sort=False)
      print(dh)
      #dh.to_csv('/home/user/Desktop/RUN3_2/Event_par/Event{}.csv'.format(shower))
-     dh.to_csv('/home/mdeluca/dataset/RUN3/RUN3/Event/Event{}.csv'.format(shower))
+     dh.to_csv(options.outputfolder+('/Event{}.csv'.format(shower)))
      #dx = pd.concat([dx, dftheta1], sort=False)
-#dfz =pd.concat([dfz, dh])
+     #dfz =pd.concat([dfz, dh])
+
+def findallShowers():
+ for shower in MCEvent:
+    findShower(shower)
+
+#python Rect.py 11 makes all rectangles, otherwise only one
+if (int(options.nshower) >0):
+ findShower(int(options.nshower))
+else:
+ findallShowers()
 
