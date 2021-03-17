@@ -51,6 +51,18 @@ dfu = pd.DataFrame()
 dfl = pd.DataFrame()
 
 def findShower(shower):
+    global df
+    global dfl
+    global du
+    global dh
+    global da
+    global dfu
+    global dfs
+    global dfs
+    global dfv
+    global dftheta1
+    global dftheta2
+
     dh = dh[0:0]
     du = du[0:0]
     do = du[0:0]

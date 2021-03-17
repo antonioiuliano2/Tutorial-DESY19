@@ -30,8 +30,8 @@ options = parser.parse_args()
 
 X=[]
 Y = []
-DeltaT = []
-DeltaT_noise = []
+#DeltaT = []
+#DeltaT_noise = []
 dfs = pd.DataFrame()
 dfu = pd.DataFrame()
 dfc = pd.DataFrame()
@@ -52,6 +52,7 @@ def calcTheta(ishower):
     del Y[:]
     #del DeltaT[:]
     #del DeltaT_noise[:]
+    global dfu
     dfu = dfu[0:0] # per creare un dataset unico con il taglio in DeltaT<=0.6rad si cmmenta con #
     #dfs = dfs[0:0]
     #dfb = dfb[0:0]

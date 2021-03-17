@@ -1,10 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import xgboost
 import collections
 from collections import OrderedDict
-import seaborn as sns
 from argparse import ArgumentParser
 '''
    Random forest training and test components.
@@ -99,7 +97,7 @@ dfforest = pd.DataFrame({'Y_test':y_test, 'Y_pred_forest':y_pred_forest}, column
 
 dfresult = pd.DataFrame(X_testMC.join(dfforest))
 print(dfresult)
-dfresult.to_csv(options.outputfolder'/Prediction.csv')
+dfresult.to_csv(options.outputfolder+'/Prediction.csv')
 
 
 

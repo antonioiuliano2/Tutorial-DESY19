@@ -44,11 +44,11 @@ parser.add_argument("-if","--inputfolder",dest="inputfolder",help="folder to acc
 parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
 options = parser.parse_args()
 
-f1 = figure(figsize=(12.5, 7))
-ax1 = f1.gca()
+#f1 = figure(figsize=(12.5, 7))
+#ax1 = f1.gca()
 
-f2 = figure(figsize=(12.5,7))
-ax2 = f2.gca()
+#f2 = figure(figsize=(12.5,7))
+#ax2 = f2.gca()
 
 df = pd.DataFrame()
 dfproiezioni = pd.DataFrame()
@@ -64,8 +64,10 @@ print(dfe)
 MCEvent = np.unique(dfe['MCEvent'].values)
 #MCEvent = [n for n in range(0,360)]
 
-i = int(input('Quanto vale i?')) # i = 140
-y = int(input('Quanto vale y?')) #y = 500
+#i = int(input('Quanto vale i?')) 
+i = 140
+#y = int(input('Quanto vale y?')) 
+y = 500
 #del dfe['Unnamed: 0']
 
 dfo = pd.DataFrame()
@@ -75,6 +77,13 @@ def calcRect(ishower):
     #dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Rect/Rect{}.csv'.format(ishower))
     dfshower = pd.read_csv(options.inputfolder+('/Rect{}.csv'.format(ishower)))
     del dfshower['Unnamed: 0'] 
+
+    global dfproiezioni
+    global dft
+    global dfPID_successivo
+    global dfnoise_rect
+    global dfnoise_successivo
+    global dft    
 
     dfproiezioni = dfproiezioni[0:0]
     dft = dft[0:0]
