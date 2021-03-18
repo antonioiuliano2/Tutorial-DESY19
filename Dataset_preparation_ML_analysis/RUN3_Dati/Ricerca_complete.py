@@ -7,6 +7,7 @@ from scipy.optimize import curve_fit
 from matplotlib import colors
 #import ROOT as R
 import numpy as np
+from argparse import ArgumentParser
 #import root_numpy as rp
 
 '''
@@ -14,7 +15,16 @@ import numpy as np
    Before launching it, please make a empty directory Event
    it will fill this folder with a file for each shower
 
+   python Ricerca_complete.py -n 10 -is Inizio_candidati_sciami.csv -it Final_data_tagliopar.csv -of Event
+
 '''
+parser = ArgumentParser()
+
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
+parser.add_argument("-it","--inputtheta",dest="inputcsvcuts",help="input dataset after cuts",required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+options = parser.parse_args()
 
 #MCEvent = [n for n in range(360, 720)]
 
@@ -23,10 +33,10 @@ MCEvent = [n for n in range(0,173)]
 #dfinizio = pd.read_csv('/home/user/Desktop/RUN3_2/Inizio_sciamenuovo.csv')
 #dfinizio = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Inizio_sciame_RUN3_3.csv')
 
-dfinizio = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Inizio_candidati_sciami.csv')
+dfinizio = pd.read_csv(options.inputcsvstarters)
 #df = pd.read_csv('/home/user/Desktop/RUN3_2/Taglio_par.csv')
 #df = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Theta/Final_dataset_RUN3_3_tagliopar.csv')
-df = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Theta/Final_data_tagliopar.csv')
+df = pd.read_csv(options.inputcsvcuts)
 #df = pd.read_csv('Theta_btdata0.csv')
 #del dfinizio['Unnamed: 0']
 del df['Unnamed: 0']
@@ -50,7 +60,19 @@ da = pd.DataFrame()
 dfu = pd.DataFrame()
 dfl = pd.DataFrame()
 
-for shower in MCEvent:
+def findShower(shower):
+    global df
+    global dfl
+    global du
+    global dh
+    global da
+    global dfu
+    global dfs
+    global dfs
+    global dfv
+    global dftheta1
+    global dftheta2
+    
     dh = dh[0:0]
     du = du[0:0]
     do = du[0:0]
@@ -251,9 +273,16 @@ for shower in MCEvent:
             do = pd.concat([do, dfb], sort=False)
     dv = dh.drop_duplicates()
     print(dv)
-    dv.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Event/Event{}.csv'.format(shower))
+    dv.to_csv(options.outputfolder+('/Event{}.csv'.format(shower)))
     
     #print(dh)
+def findallShowers():
+ for shower in MCEvent:
+    findShower(shower)
 
+if (int(options.nshower) >0):
+ findShower(int(options.nshower))
+else:
+ findallShowers()
 
 

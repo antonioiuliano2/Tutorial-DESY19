@@ -20,15 +20,22 @@ from copy import copy
 from collections import OrderedDict
 import pandas as pd
 import numpy as np
+from argparse import ArgumentParser
 
 '''
    Apply projections over real data
    it should use dZ from alignment data (see commented section)
+   python Proiezioni_Theta.py -i RUN3data.csv -o Proiezioni_RUN3data.csv
 
 '''
+parser = ArgumentParser()
+parser.add_argument("-i","--input",dest="inputcsv",help="input dataset in csv format with simulation", required=True)
+parser.add_argument("-o","--output",dest="outputcsv",help="output dataset in csv format with projection", required=True)
+
+options = parser.parse_args()
 
 dZ = 1315
-dfsignal = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/RUN3data.csv')
+dfsignal = pd.read_csv(options.inputcsv)
 print(dfsignal)
 PID_max = np.max(dfsignal['PID'])
 
@@ -149,4 +156,4 @@ for i in PID:
 #   dfg = pd.concat([dfc, dfg])
 
 
-dfsignal.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Proiezioni_RUN3data.csv')
+dfsignal.to_csv(options.outputcsv)

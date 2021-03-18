@@ -25,13 +25,24 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from copy import copy
 from collections import OrderedDict
+from argparse import ArgumentParser
 
 '''
    it builds rectangles of increasing dimensions (pyramid)
    
    before launching it, please make a empty directory
    it will fill this folder with a file for each shower
+
+   python Rect_crescenti.py -n 10 -is Inizio_candidati_sciami.csv -if Rect -of Rect_crescenti
 '''
+
+parser = ArgumentParser()
+
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
+parser.add_argument("-if","--inputfolder",dest="inputfolder",help="folder to access input datasets",required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+options = parser.parse_args()
 
 f1 = figure(figsize=(12.5, 7))
 ax1 = f1.gca()
@@ -48,20 +59,28 @@ dft = pd.DataFrame()
 
 #dfefake = pd.read_csv('/home/maria/Scrivania/TestRF/Noisefake_Ishower.csv')
 #dfefake = pd.read_csv('/home/mdeluca/dataset/Noise_New/Noisefake_Ishower.csv')
-dfefake = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Inizio_candidati_sciami.csv')
-Ishower = [n for n in range(19, 20)]
-#Ishower = np.unique(dfefake['Ishower'])
+dfefake = pd.read_csv(options.inputcsvstarters)
+#Ishower = [n for n in range(19, 20)]
+Ishower = np.unique(dfefake['Ishower'])
 #dfefake1 = dfefake.query('Ishower=={}'.format(Ishower))
-i = int(input('Quanto vale i?'))
-y = int(input('Intercetta?'))
+#i = int(input('Quanto vale i?'))
+#y = int(input('Intercetta?'))
+i = 140
+y = 500
 #del dfefake['Unnamed: 0']
 
-
-for ishower in Ishower:
+def calcRect(ishower):
     print(ishower)
     #dfshower = pd.read_csv('/home/maria/Scrivania/TestRF/Rect_Fake{}.csv'.format(ishower))
-    dfshower = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Rect/Rect_data{}.csv'.format(ishower)) 
+    dfshower = pd.read_csv(options.inputfolder+'/Rect_data{}.csv'.format(ishower)) 
     del dfshower['Unnamed: 0'] 
+
+    global dfproiezioni
+    global dft
+    global dfPID_successivo
+    global dfnoise_rect
+    global dfnoise_successivo
+    global dft    
 
     dfproiezioni = dfproiezioni[0:0]
     df = df[0:0]
@@ -104,8 +123,15 @@ for ishower in Ishower:
            dfcentrale1 = dfcentrale.copy()
        
            dft = pd.concat([dfPID_successivo1, dfcentrale1])
-           dft.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Rect_crescenti/Rect_crescentidata{}.csv'.format(ishower)) 
+           dft.to_csv(options.outputfolder+'/Rect_crescentidata{}.csv'.format(ishower)) 
            
+def calcallRects():
+ for ishower in Ishower:
+    calcRect(ishower)
 
+if (int(options.nshower) >0):
+ calcRect(int(options.nshower))
+else:
+ calcallRects()
 
 

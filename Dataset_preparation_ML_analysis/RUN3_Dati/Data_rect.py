@@ -25,6 +25,7 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from copy import copy
 from collections import OrderedDict
+from argparse import ArgumentParser
 
 '''
    first large selection in the transverse area
@@ -32,13 +33,21 @@ from collections import OrderedDict
 
    before launching it, please make a empty directory Rect
    it will fill this folder with a file for each shower
-
+   python Data_rect.py -n 10 -is Inizio_candidati_sciami.csv -ir RUN3data_selected.csv -of Rect
 '''
 
-dfefake = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Inizio_candidati_sciami.csv')
+parser = ArgumentParser()
+
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
+parser.add_argument("-ir","--inputremainder",dest="inputcsvremainder",help="input dataset in csv format with remainder of the shower", required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+options = parser.parse_args()
+
+dfefake = pd.read_csv(options.inputcsvstarters)
 print(dfefake)
 #dfnoise = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Proiezioni_RUN3data.csv')
-dfnoise = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/New/RUN3data_selected.csv')
+dfnoise = pd.read_csv(options.inputcsvremainder)
 print(dfnoise)
 #del dfefake['Unnamed: 0']
 #del dfnoise['Unnamed: 0']
@@ -52,8 +61,10 @@ dfnoise_successivo = pd.DataFrame()
 Ishower = np.unique(dfefake['Ishower'])
 #Ishower = [n for n in range(19, 20)]
 
-for ishower in Ishower:
+def calcRect(ishower):
     print(ishower)
+    global df
+
     dfishower = dfefake.query('Ishower == {}'.format(ishower))
     
     PID_min = np.min(dfishower['PID'])
@@ -70,7 +81,11 @@ for ishower in Ishower:
     df = pd.concat([dfsciame_fake1, dfishower])
     df.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Rect/Rect_data{}.csv'.format(ishower)) 
             
+def calcallRects():
+ for ishower in Ishower:
+    calcRect(ishower)
 
-
-
-
+if (int(options.nshower) >0):
+ calcRect(int(options.nshower))
+else:
+ calcallRects()

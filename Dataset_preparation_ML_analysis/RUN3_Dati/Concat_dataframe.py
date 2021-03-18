@@ -12,34 +12,36 @@ concatenates dataframes for all showers
 First part: after Theta and IP/DeltaZ selections
 Second part: after introducing dx, dy, dTX, dTY, after calling Ricerca_new.py (set paths correctly)
 '''
+def afterthetacut():
+ '''Unisce i dataset ottenuti dopo il taglio in Theta e in IP/DeltaZ'''
+ dftot = pd.DataFrame()
 
-dftot = pd.DataFrame()
-
-MCEvent = [n for n in range(0, 173)]
-for shower in MCEvent:
+ MCEvent = [n for n in range(0, 173)]
+ for shower in MCEvent:
     print(shower)
-    df = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Theta/ThetaIP_btdata{}.csv'.format(shower))
+    df = pd.read_csv('Theta/ThetaIP_btdata{}.csv'.format(shower))
     del df['Unnamed: 0']
     dftot = pd.concat([dftot, df])
 
-'''
-for j in MCEvent:
-   if  dftot.query('Ishower=={}'.format(j)).empty:
-       print(j)    
-'''
+ for j in MCEvent:
+    if  dftot.query('Ishower=={}'.format(j)).empty:
+     print(j)    
 
-dftot.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Theta/Final_data_tagliopar.csv')
+ dftot.to_csv('Theta/Final_data_tagliopar.csv')
 
-'''
-for shower in MCEvent:
+def afternewvariables():
+ '''Unisce i dataset l'introduzione delle variabili dx, dy, dTX, dTY, da usare dopo Ricerca_new.py'''
+ dftot = pd.DataFrame()
+
+ MCEvent = [n for n in range(0, 173)]
+ for shower in MCEvent:
     print(shower)
-    df = pd.read_csv('/home/mdeluca/dataset/RUN3/Event/Event{}.csv'.format(shower))
+    df = pd.read_csv('Event/Event{}.csv'.format(shower))
     del df['Unnamed: 0']
     dftot = pd.concat([dftot, df])
 
-for j in MCEvent:
+ for j in MCEvent:
    if  dftot.query('Ishower=={}'.format(j)).empty:
        print(j)    
 
-dftot.to_csv('/home/mdeluca/dataset/RUN3/RUN3/Event/Final_dataset_RUN3.csv')
-'''
+ dftot.to_csv('Event/Final_dataset_RUN3.csv')
