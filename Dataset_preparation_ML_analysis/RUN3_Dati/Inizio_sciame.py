@@ -28,7 +28,7 @@ from argparse import ArgumentParser
 
 '''
    definisce il punto di inizio dello sciame e gli altri segmenti associati
-   python Inizio_sciame.py -i Proiezioni_RUN3data.csv -os Inizio_candidati_sciami.csv -or PID_ric_RUN3.csv
+   python Inizio_sciame.py -i Proiezioni_RUN3data.csv -os Inizio_candidati_sciami.csv -or  RUN3data_selected.csv
 '''
 
 parser = ArgumentParser()
@@ -45,8 +45,17 @@ maxplates = 3 #first 3 plates
 maxPID = dfevent["PID"].max()
 minPID = maxPID - maxplates + 1 #maxPID is included (ie.,26,27,28)
 #getting shower starters and remainder base tracks
-dfstarters = dfevent.query("TrackID>=0 and PID >= {} and sqrt(TX*TX+TY*TY)<={}".format(minPID, maxtheta))
+dfcandidates = dfevent.query("TrackID>=0 and PID >= {} and sqrt(TX*TX+TY*TY)<={}".format(minPID, maxtheta))
 dfremainder = dfevent.query("not(TrackID>=0 and PID >= {} and sqrt(TX*TX+TY*TY)<={})".format(minPID, maxtheta))
 
+dfcandidates = dfcandidates.sort_values("PID",ascending=False) #from most upstream plate to most downstream
+dfstarters = dfcandidates.groupby("TrackID").last() #taking the last segment (accepting the selection) of tracks
+#we want to know which we excluded to add them back to remainder
+dfnotstarters = dfcandidates.merge(dfstarters,how = 'left', indicator = True).query("_merge='left_only'")
+del dfnotstarters["_merge"]
+dfremainder = pd.concat([dfremainder,dfnotstarters])
+
+#adding increasing counter Ishower
+dfstarters["Ishower"]=np.arange(0, len(dfstarters))
 dfstarters.to_csv(options.outputcsvstarters)
 dfremainder.to_csv(options.outputcsvremainder)
