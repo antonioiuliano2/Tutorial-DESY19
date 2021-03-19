@@ -51,7 +51,7 @@ dfremainder = dfevent.query("not(TrackID>=0 and PID >= {} and sqrt(TX*TX+TY*TY)<
 dfcandidates = dfcandidates.sort_values("PID",ascending=False) #from most upstream plate to most downstream
 dfstarters = dfcandidates.groupby("TrackID").last() #taking the last segment (accepting the selection) of tracks
 #we want to know which we excluded to add them back to remainder
-dfnotstarters = dfcandidates.merge(dfstarters,how = 'left', indicator = True).query("_merge='left_only'")
+dfnotstarters = dfcandidates.merge(dfstarters,how = 'left', indicator = True).query("_merge=='left_only'")
 del dfnotstarters["_merge"]
 dfremainder = pd.concat([dfremainder,dfnotstarters])
 
