@@ -44,11 +44,11 @@ parser.add_argument("-if","--inputfolder",dest="inputfolder",help="folder to acc
 parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
 options = parser.parse_args()
 
-f1 = figure(figsize=(12.5, 7))
-ax1 = f1.gca()
+#f1 = figure(figsize=(12.5, 7))
+#ax1 = f1.gca()
 
-f2 = figure(figsize=(12.5,7))
-ax2 = f2.gca()
+#f2 = figure(figsize=(12.5,7))
+#ax2 = f2.gca()
 
 df = pd.DataFrame()
 dfproiezioni = pd.DataFrame()
@@ -75,6 +75,7 @@ def calcRect(ishower):
     dfshower = pd.read_csv(options.inputfolder+'/Rect_data{}.csv'.format(ishower)) 
     del dfshower['Unnamed: 0'] 
 
+    global df
     global dfproiezioni
     global dft
     global dfPID_successivo

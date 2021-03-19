@@ -1,0 +1,11 @@
+executable            = PreReco_Data.sh
+arguments             = $(ClusterID) $(ProcId)
+output                = output/PreReco.$(ClusterId).$(ProcId).out
+error                 = error/PreReco.$(ClusterId).$(ProcId).err
+log                   = log/PreReco.$(ClusterId).log
+getenv = False
+RequestCpus = 5
+notification = Never
++JobFlavour             ="testmatch"
+queue 151
+

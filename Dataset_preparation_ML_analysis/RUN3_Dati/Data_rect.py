@@ -33,7 +33,7 @@ from argparse import ArgumentParser
 
    before launching it, please make a empty directory Rect
    it will fill this folder with a file for each shower
-   python Data_rect.py -n 10 -is Inizio_candidati_sciami.csv -ir RUN3data_selected.csv -of Rect
+   python Data_rect.py -n 10 -is Inizio_candidati_sciami.csv -ir RUN3data_ric.csv -of Rect
 '''
 
 parser = ArgumentParser()
@@ -79,7 +79,7 @@ def calcRect(ishower):
     dfsciame_fake1 = dfsciame_fake.copy()
     dfsciame_fake1['Ishower'] = ishower
     df = pd.concat([dfsciame_fake1, dfishower])
-    df.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Rect/Rect_data{}.csv'.format(ishower)) 
+    df.to_csv((options.outputfolder+'/Rect_data{}.csv'.format(ishower))) 
             
 def calcallRects():
  for ishower in Ishower:

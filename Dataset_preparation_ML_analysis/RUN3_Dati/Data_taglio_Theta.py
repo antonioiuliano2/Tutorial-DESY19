@@ -53,6 +53,7 @@ def calcTheta(ishower):
     del Y[:]
 
     global dfu
+    global dfs
     #del DeltaT[:]
     #del DeltaT_noise[:]
     dfu = dfu[0:0] # per creare un dataset unico con il taglio in DeltaT<=0.6rad
