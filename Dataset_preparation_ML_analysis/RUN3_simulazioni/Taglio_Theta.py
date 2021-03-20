@@ -22,7 +22,7 @@ python Taglio_Theta.py -n 10 -is Inizio_sciame_RUN3.csv -if Rect_crescenti -of T
 
 parser = ArgumentParser()
 
-parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=-1)
 parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
 parser.add_argument("-if","--inputfolder",dest="inputfolder",help="folder to access input datasets",required=True)
 parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
@@ -128,7 +128,7 @@ def calcallThetas():
     calcTheta(shower)
 
 #python Rect.py 11 makes all rectangles, otherwise only one
-if (int(options.nshower) >0):
+if (int(options.nshower) >=0):
  calcTheta(int(options.nshower))
 else:
  calcallThetas()
