@@ -20,7 +20,7 @@ from argparse import ArgumentParser
 '''
 parser = ArgumentParser()
 
-parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=-1)
 parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
 parser.add_argument("-it","--inputtheta",dest="inputcsvcuts",help="input dataset after cuts",required=True)
 parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
@@ -257,7 +257,7 @@ def findallShowers():
     findShower(shower)
 
 #python Rect.py 11 makes all rectangles, otherwise only one
-if (int(options.nshower) >0):
+if (int(options.nshower) >=0):
  findShower(int(options.nshower))
 else:
  findallShowers()

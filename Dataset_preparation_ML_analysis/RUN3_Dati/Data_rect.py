@@ -33,12 +33,12 @@ from argparse import ArgumentParser
 
    before launching it, please make a empty directory Rect
    it will fill this folder with a file for each shower
-   python Data_rect.py -n 10 -is Inizio_candidati_sciami.csv -ir RUN3data_selected.csv -of Rect
+   python Data_rect.py -n 10 -is Inizio_candidati_sciami.csv -ir RUN3data_ric.csv -of Rect
 '''
 
 parser = ArgumentParser()
 
-parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=-1)
 parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
 parser.add_argument("-ir","--inputremainder",dest="inputcsvremainder",help="input dataset in csv format with remainder of the shower", required=True)
 parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
@@ -79,13 +79,13 @@ def calcRect(ishower):
     dfsciame_fake1 = dfsciame_fake.copy()
     dfsciame_fake1['Ishower'] = ishower
     df = pd.concat([dfsciame_fake1, dfishower])
-    df.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Rect/Rect_data{}.csv'.format(ishower)) 
+    df.to_csv((options.outputfolder+'/Rect_data{}.csv'.format(ishower))) 
             
 def calcallRects():
  for ishower in Ishower:
     calcRect(ishower)
 
-if (int(options.nshower) >0):
+if (int(options.nshower) >=0):
  calcRect(int(options.nshower))
 else:
  calcallRects()

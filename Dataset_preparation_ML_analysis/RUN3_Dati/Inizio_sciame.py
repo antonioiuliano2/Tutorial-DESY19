@@ -28,7 +28,7 @@ from argparse import ArgumentParser
 
 '''
    definisce il punto di inizio dello sciame e gli altri segmenti associati
-   python Inizio_sciame.py -i Proiezioni_RUN3data.csv -os Inizio_candidati_sciami.csv -or  RUN3data_selected.csv
+   python Inizio_sciame.py -i Proiezioni_RUN3data.csv -os Inizio_candidati_sciami.csv -or  RUN3data_ric.csv
 '''
 
 parser = ArgumentParser()

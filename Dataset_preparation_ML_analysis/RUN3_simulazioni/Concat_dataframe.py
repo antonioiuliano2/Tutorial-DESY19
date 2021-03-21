@@ -14,7 +14,7 @@ Second part: after introducing dx, dy, dTX, dTY, after calling Ricerca_new.py
 def afterthetacut():
  '''Unisce i dataset ottenuti dopo il taglio in Theta e in IP/DeltaZ'''
  dftot = pd.DataFrame()
- dfu = pd.read_csv('Inizio_sciame_RUN6.csv')
+ dfu = pd.read_csv('Inizio_sciame_RUN5.csv')
 
  MCEvent = np.unique(dfu['MCEvent'])
 
@@ -38,7 +38,7 @@ def afterthetacut():
 def afternewvariables():
  '''Unisce i dataset l'introduzione delle variabili dx, dy, dTX, dTY, da usare dopo Ricerca_new.py'''
  dftot = pd.DataFrame()
- dfu = pd.read_csv('Inizio_sciame_RUN6.csv')
+ dfu = pd.read_csv('Inizio_sciame_RUN5.csv')
 
  MCEvent = np.unique(dfu['MCEvent'])
 
