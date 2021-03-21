@@ -10,28 +10,35 @@ from argparse import ArgumentParser
 
    Before launching it, please make a empty directory Random_Forest
    it will fill this folder with a file for each shower
-   python Random_Forest_Ishower.py -id Event/Final_dataset_RUN6.csv -of Random_Forest
+   python Random_Forest_Ishower.py -id Final_dataset_training.csv -id2 Final_dataset_test.csv -of Random_Forest
+   if test dataset is not provided, it will split the first dataset in training and test (0.3 test, 0.7 training)
 '''
 
 parser = ArgumentParser()
-parser.add_argument("-id","--inputdataset",dest="inputcsvdataset",help="folder to access input datasets",required=True)
+parser.add_argument("-id","--inputdataset",dest="inputcsvdatasettraining",help="input dataset for training",required=True)
+parser.add_argument("-id2","--inputdatasettest",dest="inputcsvdatasettest",help="input dataset for test",default=None)
 parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
 options = parser.parse_args()
 
-data1 = pd.read_csv(options.inputcsvdataset)  # RUN3_2 --> 2 dataset del RUN3
-#data2 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Event/Final_dataset_RUN3_3.csv')  # RUN3_3 --> 3 dataset del RUN3
+data1 = pd.read_csv(options.inputcsvdatasettraining)  # RUN3_2 --> 2 dataset del RUN3
 
 del data1['Unnamed: 0']
-#del data2['Unnamed: 0']
 
 y = data1.loc[:, 'Signal']
 X = data1.loc[:,['x','y','z','TX','TY','PID','X_Next','Y_Next','dx','P','Flag','MCTrack','dy','dTX','dTY','dR','dT','DeltaT','Par_impact_nor','Angolo_cono','MCEvent','Ishower']]
 
-#X1 = data2.loc[:,['x','y','z','TX','TY','PID','X_Next','Y_Next','dx','P','Flag','MCTrack','dy','dTX','dTY','dR','dT','DeltaT','Par_impact_nor','Angolo_cono', 'MCEvent','Ishower']]
-#y1 = data2.loc[:,'Signal']
+if (options.inputcsvdatasettest):
+ data2 = pd.read_csv(options.inputcsvdatasettest)  # RUN3_3 --> 3 dataset del RUN3
+ del data2['Unnamed: 0']
+ 
+ X1 = data2.loc[:,['x','y','z','TX','TY','PID','X_Next','Y_Next','dx','P','Flag','MCTrack','dy','dTX','dTY','dR','dT','DeltaT','Par_impact_nor','Angolo_cono', 'MCEvent','Ishower']]
+ y1 = data2.loc[:,'Signal']
+ y_train = y
+ y_test = y1
 
-from sklearn.model_selection import train_test_split
-X_trainMC, X_testMC, y_train, y_test = train_test_split(X,y, test_size=0.3, random_state=0, stratify=y)
+else:
+ from sklearn.model_selection import train_test_split
+ X, X1, y_train, y_test = train_test_split(X,y, test_size=0.3, random_state=0, stratify=y)
 
 #X_tot = X_testMC.append(X1)
 
@@ -39,11 +46,9 @@ X_trainMC, X_testMC, y_train, y_test = train_test_split(X,y, test_size=0.3, rand
 #y_test = y_testMC.append(y1)
 #X_train = X_trainMC.loc[:,['x','y','z','TX','TY','X_Next','Y_Next','dx','dy','dTX','dTY']]
 
-X_train = X_trainMC.loc[:,['dx','dy','dTX','dTY','DeltaT', 'Par_impact_nor','Angolo_cono']]
-#y_train = y
+X_train = X.loc[:,['dx','dy','dTX','dTY','DeltaT', 'Par_impact_nor','Angolo_cono']]
 
-X_test = X_testMC.loc[:,['dx','dy','dTX','dTY', 'DeltaT', 'Par_impact_nor','Angolo_cono']]
-#y_test = y1
+X_test = X1.loc[:,['dx','dy','dTX','dTY', 'DeltaT', 'Par_impact_nor','Angolo_cono']]
 
 
 from sklearn.preprocessing import StandardScaler
@@ -95,7 +100,7 @@ dfnew.to_csv(options.outputfolder+'/Classification_Report1.csv', index=True)
 labels = ['Y_test','Y_pred_forest']
 dfforest = pd.DataFrame({'Y_test':y_test, 'Y_pred_forest':y_pred_forest}, columns = labels)
 
-dfresult = pd.DataFrame(X_testMC.join(dfforest))
+dfresult = pd.DataFrame(X1.join(dfforest))
 print(dfresult)
 dfresult.to_csv(options.outputfolder+'/Prediction.csv')
 

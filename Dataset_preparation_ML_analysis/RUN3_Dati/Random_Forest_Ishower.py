@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import xgboost
 import collections
 from collections import OrderedDict
-import seaborn as sns
+from argparse import ArgumentParser
 import pickle
 
 '''
@@ -13,7 +12,15 @@ import pickle
 
    Before launching it, please make a empty directory Random_Forest
    it will fill this folder with a file for each shower
+   python Random_Forest_Ishower.py -id Final_dataset_training.csv -id2 Final_dataset_test.csv -id3 Final_dataset_application.csv -of Random_Forest
 '''
+
+parser = ArgumentParser()
+parser.add_argument("-id","--inputdataset",dest="inputcsvdatasettraining",help="input dataset for training",required=True)
+parser.add_argument("-id2","--inputdatasettest",dest="inputcsvdatasettest",help="input dataset for test",required=True)
+parser.add_argument("-id3","--inputdatasetapplication",dest="inputcsvdatasetapplication",help="input dataset for application over real data",required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+options = parser.parse_args()
 
 #data1 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_1/Dataset_Parametro_Impatto/Final_dataset1.csv')
 #data2 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/SN_Knear/Final_dataset_RUN3_3.csv') #Final_dataset_RUN3_3_new.csv
@@ -27,8 +34,8 @@ import pickle
 #data2 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Theta/Theta_RUN3_3.csv')
 #data3 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Theta/Theta_data_RUN3.csv')
 
-data11 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_2/Event/Event_tot_RUN3_2.csv')
-data21 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_3/Event/Event_tot_RUN3_3.csv')
+data11 = pd.read_csv(options.inputcsvdatasettraining)
+data21 = pd.read_csv(options.inputcsvdatasettest)
 
 #data3 = pd.DataFrame()
 
@@ -45,7 +52,7 @@ data2 = data21.dropna()
 #del data32['Unnamed: 0']
 
 #data3 = pd.concat([data31, data32])
-data3 = pd.read_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Event/Event_tot.csv')
+data3 = pd.read_csv(options.inputcsvdatasetapplication)
 #data3 = pd.DataFrame()
 
 #data3 = data33.dropna()
@@ -116,17 +123,16 @@ crf = classification_report(y_test, y_pred_forest)
 cmf = confusion_matrix(y_test, y_pred_forest)
 dforest = pd.DataFrame(cmf)
 print(dforest)
-#dforest.to_csv('/home/mdeluca/dataset/RUN3/TestRF/Training123_test47/Confusion_matrix.csv')
-#dforest.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Random_Forest/Confusion_matrix_testRUN3_2.csv')
-#ff = open('/home/mdeluca/dataset/RUN3/TestRF/Training123_test47/Report.txt', 'w')
-#ff.write('Title\n\nClassification Report\n\n{}'.format(crf))
-#ff.close()
+dforest.to_csv(options.outputfolder+'/Confusion_matrix1.csv')
+ff = open(options.outputfolder+'/Report_Forest1.txt', 'w')
+ff.write('Title\n\nClassification Report\n\n{}'.format(crf))
+ff.close()
 dfnew = pd.DataFrame(classification_report(y_test, y_pred_forest, output_dict=True)).transpose()
 
 print('-----------------------------------------------')
 print('Classification Report')
 print(dfnew)
-#dfnew.to_csv('/home/mdeluca/dataset/RUN3/TestRF/Training123_test47/Classification_Report.csv', index=True)
+dfnew.to_csv(options.outputfolder+'/Classification_Report1.csv', index=True)
 #dfnew.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Random_Forest/Classification_Report_testRUN3_2.csv',index=True)
 
 labels = ['Y_test','Y_pred_forest']
@@ -139,7 +145,7 @@ y_pred_data = forest.predict(X_pred_std)
 dfpred = pd.DataFrame({'Y_pred_forest_data':y_pred_data})
 dfresult_data = pd.DataFrame(data3.join(dfpred))
 
-#dfresult.to_csv('/home/mdeluca/dataset/RUN3/TestRF/Training123_test47/Prediction.csv')
+dfresult.to_csv(options.outputfolder+'/Prediction.csv')
 
 #dfresult.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Random_Forest/Resut_testRUN3_2.csv')
 #print('Inizio pickle')
@@ -151,7 +157,7 @@ dfresult_data = pd.DataFrame(data3.join(dfpred))
 from sklearn.metrics import roc_curve, auc
 from sklearn import metrics
 from sklearn.metrics import roc_auc_score
-#dfresult_data.to_csv('/home/mdeluca/dataset/RUN3/RUN3_data/Random_Forest/Result_data.csv')
+dfresult_data.to_csv(options.outputfolder+'/Result_data.csv')
 
 
 #forest.fit(X_train_std, y_train)
