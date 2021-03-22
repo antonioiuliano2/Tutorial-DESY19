@@ -172,14 +172,14 @@ def addtrueMCinfo(df,simfile, ship_charm):
  arr_MotherID = np.zeros(nsegments, dtype=int)
  arr_ProcID = np.zeros(nsegments, dtype=int)
 
- arr_startX = np.zeros(nsegments,dtype=float)
- arr_startY = np.zeros(nsegments,dtype=float)
- arr_startZ = np.zeros(nsegments,dtype=float)
- arr_startT = np.zeros(nsegments,dtype=float)
+ arr_startX = np.zeros(nsegments,dtype=np.float32)
+ arr_startY = np.zeros(nsegments,dtype=np.float32)
+ arr_startZ = np.zeros(nsegments,dtype=np.float32)
+ arr_startT = np.zeros(nsegments,dtype=np.float32)
  
- arr_startPx = np.zeros(nsegments,dtype=float)
- arr_startPy = np.zeros(nsegments,dtype=float)
- arr_startPz = np.zeros(nsegments,dtype=float)
+ arr_startPx = np.zeros(nsegments,dtype=np.float32)
+ arr_startPy = np.zeros(nsegments,dtype=np.float32)
+ arr_startPz = np.zeros(nsegments,dtype=np.float32)
 
  for (MCEvent, MCTrack) in zip(df['MCEvent'], df['MCTrack']):
 
@@ -269,6 +269,40 @@ def addtrackindex(df, trackfilename):
  #Now I need to merge them, however I want to keep all the segments, not only the ones which have been tracked. Luckily, there are many ways to do a merge (default is inner)
  dfwithtracks = df.merge(dftracks,how = 'left', on=["PID","ID"])
  return dfwithtracks
+
+def retrievetrackinfo(df, trackfilename):
+  '''from trackindex, make a dataframe with fitted position and angles of the tracks'''
+  trackfile = r.TFile.Open(trackfilename)
+  tracktree = trackfile.Get("tracks")
+
+  dftracked = df.query("TrackID>=0") #we access the subset with tracks
+  #we keep only the first segment of eacht track
+  dftracked = dftracked.sort_values("PID",ascending=False)
+  dftracked = dftracked.groupby("TrackID").first()
+  dftracked = dftracked.reset_index()
+  #how many tracks we have? What are their TrackIDs?
+  ntracks = len(dftracked)
+  trackID = dftracked["TrackID"].to_numpy(dtype=int)
+  #preparing arrays to store informatino
+  Xarr = np.zeros(ntracks,dtype=np.float32)
+  Yarr = np.zeros(ntracks,dtype=np.float32)
+  TXarr = np.zeros(ntracks,dtype=np.float32)
+  TYarr = np.zeros(ntracks,dtype=np.float32)
+  #loop over tracks
+  for trid in trackID:
+    #retrieving trackinfo
+    tracktree.GetEntry(trid)
+    track = tracktree.t
+    
+    Xarr[trid]=track.X()
+    Yarr[trid]=track.Y()
+    TXarr[trid]=track.TX()
+    TYarr[trid]=track.TY()
+  #end of loop, preparing outputdataframe and returning it
+  trackdf = pd.DataFrame({"TrackID":trackID,"X":Xarr,"Y":Yarr,"TX":TXarr,"TY":TYarr},columns = ["TrackID","X","Y","TX","TY"])
+  return trackdf 
+
+  
 
 def addvertexindex(df,vertexfilename):
   '''adding vertex index to dataframe. Requires Track Index'''
