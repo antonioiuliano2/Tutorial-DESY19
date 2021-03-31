@@ -7,6 +7,7 @@ def applyconversion(nbrick):
  '''convert couples ROOT files into a csv'''
 
  df = desy19.builddataframe(nbrick)
+ df = desy19.addtrackindex(df,"linked_tracks.root")
 
  return df 
 
