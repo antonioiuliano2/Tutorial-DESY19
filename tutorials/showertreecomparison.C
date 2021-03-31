@@ -62,7 +62,7 @@ void showertreecomparison(){
 
     //drawing histograms
     TCanvas *c0 = new TCanvas();
-    hdata_IP->Scale(1/hdata_IP->Integral());
+   // hdata_IP->Scale(1/hdata_IP->Integral());
     hsim_IP->Scale(1/hsim_IP->Integral());
     hsim_IP->SetLineColor(kRed);
     hsim_IP->DrawClone("histo");
@@ -70,7 +70,7 @@ void showertreecomparison(){
     c0->BuildLegend();
 
     TCanvas *c1 = new TCanvas();
-    hdata_thetaproj->Scale(1/hdata_thetaproj->Integral());
+    //hdata_thetaproj->Scale(1/hdata_thetaproj->Integral());
     hsim_thetaproj->Scale(1/hsim_thetaproj->Integral());
     hsim_thetaproj->SetLineColor(kRed);
     hsim_thetaproj->DrawClone("histo");
@@ -107,7 +107,7 @@ void showertreecomparison(){
 
 void PrepareHistogram(TH1D* histo, const char * name, const char* title, int linecolor){
 
-    histo->Scale(1./histo->Integral());
+    //histo->Scale(1./histo->Integral());
     histo->SetName(name);
     histo->SetTitle(title);
     histo->SetLineColor(linecolor);
@@ -135,20 +135,20 @@ void RMcomparison(){
     PrepareHistogram(hRM_thetaproj,"hRM_thetaproj","Random Forest Reconstruction;#theta'",kRed);
 
     TCanvas *csize = new TCanvas();
-    hstandard_size->Draw("histo");
-    hRM_size->Draw("histo && SAMES");
+    hRM_size->Draw("histo");
+    hstandard_size->Draw("histo && SAMES");
     csize->BuildLegend();
     hstandard_size->SetTitle("Size of reconstructed showers;NSegments");
 
     TCanvas *cnormIP = new TCanvas();
-    hstandard_normIP->Draw("histo");
-    hRM_normIP->Draw("histo && SAMES");
+    hRM_normIP->Draw("histo");
+    hstandard_normIP->Draw("histo && SAMES");
     cnormIP->BuildLegend();
     hstandard_normIP->SetTitle("Impact parameter over distance along axis;IP/#DeltaZ");
 
     TCanvas *cthetaproj = new TCanvas();
-    hstandard_thetaproj->Draw("histo");
-    hRM_thetaproj->Draw("histo && SAMES");
+    hRM_thetaproj->Draw("histo");
+    hstandard_thetaproj->Draw("histo && SAMES");
     cthetaproj->BuildLegend();
     hstandard_thetaproj->SetTitle("Cone angle with respect to shower start;#theta'[rad]");
 }
