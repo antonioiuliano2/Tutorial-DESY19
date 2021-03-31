@@ -15,10 +15,15 @@ with a gaussian on Erec - Etrue / Etrue
 
 '''
 
-dffinale_data = pd.read_csv('/home/mdeluca/dataset/RUN3/Random_Forest/Lunghezza_sciami_ric.csv')
-df = dffinale_data.query('Signal+BackSig>=50')
+dffinale_data = pd.read_csv('/home/utente/Simulations/Exercise_MariaChain/RUN5test/Random_Forest_withdata/Result_data.csv')
+#df = dffinale_data.query('Signal+BackSig>=50')
+minsize = 20
 
-Energy = 6
+df = dffinale_data.query("Y_pred_forest_data==1")
+
+Energy = 2
+sizedataset = df.groupby("Ishower").count()
+size = sizedataset["ID"].to_numpy()
 
 p0 = 0.42
 p1 = 0.04
@@ -26,12 +31,13 @@ Ishower = np.unique(df['Ishower'].values)
 #Ishower = [n for n in range(1080, 1082)]
 dfu = pd.DataFrame()
 
-for shower in Ishower:
+for index, shower in enumerate(Ishower):
     print(shower)
-    dft = df.query('Ishower=={}'.format(shower))
+    dft = df.groupby("Ishower").first() #only one entry per shower
+    dft = dft.query('Ishower=={}'.format(shower))
    
-    x0 = dft['Signal'].values
-   
+    #x0 = dft['Signal'].values
+    x0 = size[index]
     x = x0
  
     Erec = p1*x+p0

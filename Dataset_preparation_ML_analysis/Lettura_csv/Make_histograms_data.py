@@ -5,10 +5,10 @@ import ROOT as r
 import root_numpy as rp
 
 minsegments = 50
-histofile = r.TFile("/home/utente/Lavoro/DE19_R3/RUN3_RandomForest_histos.root","RECREATE")
+histofile = r.TFile("/home/utente/Simulations/Exercise_MariaChain/RUN5test/RUN5_RandomForest_histos.root","RECREATE")
 #importing csv file in a dataframe, taking segments classified as true
 
-datadf = pd.read_csv("/home/utente/Lavoro/DE19_R3/Dati_nuovo.csv")
+datadf = pd.read_csv("/home/utente/Simulations/Exercise_MariaChain/RUN5test/Random_Forest_withdata/Result_data.csv")
 datadf = datadf[datadf["DeltaT"].isna()==False] 
 signaldf = datadf.query("Y_pred_forest_data==1")
 
@@ -16,12 +16,12 @@ signaldf = datadf.query("Y_pred_forest_data==1")
 sizedataset = signaldf.groupby("Ishower").count()
 size = sizedataset["ID"].to_numpy()
 #size = size + 1 #we need to include the injectors (not in this dataset)
-goodshowers = sizedataset.query("ID>=50").index.to_numpy() #Ishower for showers with at least 50 segments
+goodshowers = sizedataset.query("ID>=20").index.to_numpy() #Ishower for showers with at least 50 segments
 
 gooddf = signaldf[signaldf["Ishower"].isin(goodshowers)]
 
 #make histograms
-hsizeML = r.TH1D("hsizeML","Size of showers reconstructed by Random Forest;Nsegments", 18,0,180)
+hsizeML = r.TH1D("hsizeML","Size of showers reconstructed by Random Forest;Nsegments", 10,0,100)
 rp.fill_hist(hsizeML,size)
 
 hIPnorm = r.TH1D("hIPnorm","Impact parameter over distance along axis;IP/#DeltaZ",30,0.,0.3)

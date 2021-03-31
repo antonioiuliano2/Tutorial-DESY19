@@ -22,10 +22,10 @@ python Taglio_Theta.py -n 10 -is Inizio_candidati_sciami.csv -if Rect_crescenti 
 '''
 parser = ArgumentParser()
 
-parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=0)
-parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
-parser.add_argument("-if","--inputfolder",dest="inputfolder",help="folder to access input datasets",required=True)
-parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=-1)
+parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors (e.g. Inizio_candidati_sciami.csv)", required=True)
+parser.add_argument("-if","--inputfolder",dest="inputfolder",help="folder to access input datasets (e.g. Rect_crescenti)",required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets (e.g. Theta)",required=True)
 options = parser.parse_args()
 
 X=[]
@@ -53,6 +53,7 @@ def calcTheta(ishower):
     del Y[:]
 
     global dfu
+    global dfs
     #del DeltaT[:]
     #del DeltaT_noise[:]
     dfu = dfu[0:0] # per creare un dataset unico con il taglio in DeltaT<=0.6rad
@@ -129,7 +130,7 @@ def calcallThetas():
   for ishower in Ishower:
     calcTheta(ishower)
 
-if (int(options.nshower) >0):
+if (int(options.nshower) >=0):
  calcTheta(int(options.nshower))
 else:
  calcallThetas()

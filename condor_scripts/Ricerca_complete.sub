@@ -1,0 +1,11 @@
+executable            = Ricerca_complete.sh
+arguments             = $(ClusterID) $(ProcId)
+output                = output/Ricerca.$(ClusterId).$(ProcId).out
+error                 = error/Ricerca.$(ClusterId).$(ProcId).err
+log                   = log/Ricerca.$(ClusterId).log
+getenv = False
+RequestCpus = 5
+notification = Never
++JobFlavour             ="testmatch"
+queue 151
+
