@@ -30,8 +30,8 @@ from argparse import ArgumentParser
 '''
 
 parser = ArgumentParser()
-parser.add_argument("-i","--input",dest="inputcsv",help="input dataset in csv format with simulation", required=True)
-parser.add_argument("-o","--output",dest="outputcsv",help="output dataset in csv format with projection", required=True)
+parser.add_argument("-i","--input",dest="inputcsv",help="input dataset in csv format with simulation (e.g. RUN5.csv)", required=True)
+parser.add_argument("-o","--output",dest="outputcsv",help="output dataset in csv format with projection (e.g. Proiezioni_RUN5.csv)", required=True)
 
 options = parser.parse_args()
 
