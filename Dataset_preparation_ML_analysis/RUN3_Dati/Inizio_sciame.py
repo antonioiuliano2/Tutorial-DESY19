@@ -32,9 +32,9 @@ from argparse import ArgumentParser
 '''
 
 parser = ArgumentParser()
-parser.add_argument("-i","--input",dest="inputcsv",help="input dataset in csv format with projections", required=True)
-parser.add_argument("-os","--outputstarters",dest="outputcsvstarters",help="output dataset in csv format with shower injectors", required=True)
-parser.add_argument("-or","--outputremainder",dest="outputcsvremainder",help="output dataset in csv format with remainder of the shower", required=True)
+parser.add_argument("-i","--input",dest="inputcsv",help="input dataset in csv format with projections (e.g. Proiezioni_RUN5.csv)", required=True)
+parser.add_argument("-os","--outputstarters",dest="outputcsvstarters",help="output dataset in csv format with shower injectors (e.g. Inizio_candidati_sciami.csv)", required=True)
+parser.add_argument("-or","--outputremainder",dest="outputcsvremainder",help="output dataset in csv format with remainder of the shower (e.g. RUN5data_ric.csv)", required=True)
 options = parser.parse_args()
 
 dfevent = pd.read_csv(options.inputcsv)

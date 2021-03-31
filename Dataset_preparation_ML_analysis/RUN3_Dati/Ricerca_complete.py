@@ -21,9 +21,9 @@ from argparse import ArgumentParser
 parser = ArgumentParser()
 
 parser.add_argument("-n","--nshower",dest="nshower",help="number of shower event",default=-1)
-parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors", required=True)
-parser.add_argument("-it","--inputtheta",dest="inputcsvcuts",help="input dataset after cuts",required=True)
-parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets",required=True)
+parser.add_argument("-is","--inputstarters",dest="inputcsvstarters",help="input dataset in csv format with shower injectors (e.g. Inizio_candidati_sciami.csv)", required=True)
+parser.add_argument("-it","--inputtheta",dest="inputcsvcuts",help="input dataset after cuts (e.g. Theta/Final_data_tagliopar.csv)",required=True)
+parser.add_argument("-of","--outputfolder",dest="outputfolder",help="folder to store output datasets (e.g. Event)",required=True)
 options = parser.parse_args()
 
 #MCEvent = [n for n in range(360, 720)]
