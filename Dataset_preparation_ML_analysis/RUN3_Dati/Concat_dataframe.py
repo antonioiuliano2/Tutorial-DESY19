@@ -9,6 +9,8 @@ from copy import copy
 concatenates dataframes for all showers
 First part: after Theta and IP/DeltaZ selections
 Second part: after introducing dx, dy, dTX, dTY, after calling Ricerca_new.py (set paths correctly)
+launch with python -i Concat_dataframe.py
+then launch afterthetacut() for the first part, or afternewvariables() for the second part
 '''
 def afterthetacut():
  '''Unisce i dataset ottenuti dopo il taglio in Theta e in IP/DeltaZ'''
