@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import collections
 from collections import OrderedDict
 from copy import copy
+from argparse import ArgumentParser
 
 '''
 concatenates dataframes for all showers
@@ -12,11 +13,16 @@ Second part: after introducing dx, dy, dTX, dTY, after calling Ricerca_new.py (s
 launch with python -i Concat_dataframe.py
 then launch afterthetacut() for the first part, or afternewvariables() for the second part
 '''
+
+parser = ArgumentParser()
+parser.add_argument("-n","--nshowers",dest="nshowers",help="number of showers in data (e.g. 175)", required=True)
+options = parser.parse_args()
+
 def afterthetacut():
  '''Unisce i dataset ottenuti dopo il taglio in Theta e in IP/DeltaZ'''
  dftot = pd.DataFrame()
 
- MCEvent = [n for n in range(0, 173)]
+ MCEvent = [n for n in range(0, options.nshowers)]
  for shower in MCEvent:
   try:
     print(shower)
@@ -36,7 +42,7 @@ def afternewvariables():
  '''Unisce i dataset l'introduzione delle variabili dx, dy, dTX, dTY, da usare dopo Ricerca_new.py'''
  dftot = pd.DataFrame()
 
- MCEvent = [n for n in range(0, 173)]
+ MCEvent = [n for n in range(0, options.nshowers)]
  for shower in MCEvent:
   try: 
     print(shower)

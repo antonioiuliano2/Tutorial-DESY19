@@ -37,6 +37,12 @@ options = parser.parse_args()
 data11 = pd.read_csv(options.inputcsvdatasettraining)
 data21 = pd.read_csv(options.inputcsvdatasettest)
 
+# I recently added TrackID information, but is NA for not tracked columns
+if "TrackID" in data11.columns: 
+ data11["TrackID"] = data11["TrackID"].fillna(-1)
+
+if "TrackID" in data21.columns:
+ data21["TrackID"] = data21["TrackID"].fillna(-1)   
 #data3 = pd.DataFrame()
 
 data1 = pd.DataFrame()
@@ -53,6 +59,8 @@ data2 = data21.dropna()
 
 #data3 = pd.concat([data31, data32])
 data3 = pd.read_csv(options.inputcsvdatasetapplication)
+if "TrackID" in data3.columns:
+ data3["TrackID"] = data3["TrackID"].fillna(-1)
 #data3 = pd.DataFrame()
 
 #data3 = data33.dropna()
