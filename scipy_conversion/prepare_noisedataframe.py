@@ -63,7 +63,7 @@ def setZ(df,Z):
 
  return df
 
-def preparedataframe():
+def preparedataframe_RUN3():
  '''prepare dataframe with both noise and simulation'''
  scansetfile = r.TFile.Open("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/runs_360events/RUN3_sim_09_07_20_movingtarget/b000003/b000003.0.0.0.set.root","READ")
  scanset = scansetfile.Get("set")
@@ -159,7 +159,143 @@ def mergedataframes():
  mergeddf = pd.concat([simdf,datadf])
  mergeddf.to_csv("/eos/user/a/aiuliano/public/sims_FairShip/sim_DESY19/data_noise_firsttenplates_DESY19.csv",index=False)
 
+
+def preparedataframe_RUN7():
+ '''tungsten run, with 1215 dz and 19 plates. We do not merge with simulation anymore at this stage'''
+ scansetfile = r.TFile.Open("RUN7_sim/b000007/b000007.0.0.0.set.root","READ")
+ scanset = scansetfile.Get("set")
+ brick = scanset.eB
+
+ print("Reading input files")
+#reading dataframes from data
+ ndataplates = 4 #the two first plates from two runs
+
+ RUN1df = pd.read_csv("RUN1_data_p001/b000001/firsttwoplates.csv")
+ RUN3df = pd.read_csv("RUN3_data_p001/b000003/firsttwoplates.csv")
+
+ plates = []
+ nplates = 19
+ diffplate = int(nplates / ndataplates) #N plates with the same source
+ #duplicating dataframes for the plates of interest
+
+ for i in range(diffplate): # 7 copies of RUN3 first plate
+  plates.append(RUN3df.query("PID==1").copy())
+
+ for i in range(diffplate): # 7 copies of RUN3 second plate
+  plates.append(RUN3df.query("PID==0").copy())
+
+ for i in range(diffplate): # 7 copies of RUN1 first plate
+  plates.append(RUN1df.query("PID==1").copy())
+
+ for i in range(nplates - (3*diffplate)): # 8 copies of RUN1 second plate
+  plates.append(RUN1df.query("PID==0").copy())
+  print("Applying transformations to randomize datasets")
+ for i in range(ndataplates):
+   #plate 2
+   plates[1+i*diffplate] = reflectX(plates[0+i*diffplate],plates[1+i*diffplate])
+   plates[1+i*diffplate] = reflectY(plates[0+i*diffplate],plates[1+i*diffplate])
+   #plate 3
+   plates[2+i*diffplate] = reflectX(plates[0+i*diffplate],plates[2+i*diffplate])
+   plates[2+i*diffplate] = reflectTY(plates[0+i*diffplate],plates[2+i*diffplate])
+   #plate 4
+   plates[3+i*diffplate] = reflectY(plates[0+i*diffplate],plates[3+i*diffplate])
+   plates[3+i*diffplate] = reflectTX(plates[0+i*diffplate],plates[3+i*diffplate])
  
+ #plate 16,17 and 18 with the last kind of transformation
+ plates[16] = reflectTX(plates[0],plates[16])
+ plates[16] = reflectTY(plates[0],plates[16])
+
+ plates[17] = reflectTX(plates[4],plates[17])
+ plates[17] = reflectTY(plates[4],plates[17])
+
+ plates[18] = reflectTX(plates[8],plates[18])
+ plates[18] = reflectTY(plates[8],plates[18])
+
+ allplates = pd.DataFrame()
+
+ print("End of transformations, set PID and Z for all plates, then merge them into the final dataframe")
+
+ for iplate in range(nplates):
+    plates[iplate] = setPID(plates[iplate], nplates-1-iplate)
+    plates[iplate] = setZ(plates[iplate], brick.GetPlate(nplates-1-iplate).Z())
+    allplates = pd.concat([allplates,plates[iplate]])
+
+ allplates["Signal"] = 0
+ allplates.to_csv("data_noise_DESY19_RUN7.csv",index=False)
 
 
+def preparedataframe_RUN6():
+ '''same as RUN3, but missing 14 and 17'''
+ scansetfile = r.TFile.Open("RUN6_sim/b000006/b000006.0.0.0.set.root","READ")
+ scanset = scansetfile.Get("set")
+ brick = scanset.eB
+
+ print("Reading input files")
+#reading dataframes from data
+ ndataplates = 4 #the two first plates from two runs
+
+ RUN1df = pd.read_csv("RUN1_data_p001/b000001/firsttwoplates.csv")
+ RUN3df = pd.read_csv("RUN3_data_p001/b000003/firsttwoplates.csv")
+
+ plates = []
+
+ #duplicating dataframes for the plates of interest
+ for i in range(7): # 7 copies of RUN3 first plate
+  plates.append(RUN3df.query("PID==1").copy())
+
+ for i in range(7): # 7 copies of RUN3 second plate
+  plates.append(RUN3df.query("PID==0").copy())
+
+ for i in range(7): # 7 copies of RUN1 first plate
+  plates.append(RUN1df.query("PID==1").copy())
+
+ for i in range(8): # 8 copies of RUN1 second plate
+  plates.append(RUN1df.query("PID==0").copy())
+
+ #prepared copies of dataframe, starting transforming them from runs 4 and 5
+ diffplate = int(29/ndataplates) #if four dataplates, this is 7
+ #every time, we set the PID and apply the transformations, they are the same for both runs so I do a loop
+ print("Applying transformations to randomize datasets")
+ for i in range(ndataplates):
+  #plate 2
+  plates[1+i*diffplate] = reflectX(plates[0+i*diffplate],plates[1+i*diffplate])
+  plates[1+i*diffplate] = reflectY(plates[0+i*diffplate],plates[1+i*diffplate])
+  #plate 3
+  plates[2+i*diffplate] = reflectX(plates[0+i*diffplate],plates[2+i*diffplate])
+  plates[2+i*diffplate] = reflectTY(plates[0+i*diffplate],plates[2+i*diffplate])
+  #plate 4
+  plates[3+i*diffplate] = reflectY(plates[0+i*diffplate],plates[3+i*diffplate])
+  plates[3+i*diffplate] = reflectTX(plates[0+i*diffplate],plates[3+i*diffplate])
+  #plate 5
+  plates[4+i*diffplate] = reflectTX(plates[0+i*diffplate],plates[4+i*diffplate])
+  plates[4+i*diffplate] = reflectTY(plates[0+i*diffplate],plates[4+i*diffplate])
+  #plate 6
+  plates[5+i*diffplate] = reflectX(plates[0+i*diffplate],plates[5+i*diffplate])
+  plates[5+i*diffplate] = reflectTX(plates[0+i*diffplate],plates[5+i*diffplate])
+  plates[5+i*diffplate] = reflectTY(plates[0+i*diffplate],plates[5+i*diffplate])
+  #plate 7
+  plates[6+i*diffplate] = reflectY(plates[0+i*diffplate],plates[6+i*diffplate])
+  plates[6+i*diffplate] = reflectTX(plates[0+i*diffplate],plates[6+i*diffplate])
+  plates[6+i*diffplate] = reflectTY(plates[0+i*diffplate],plates[6+i*diffplate])
+
+ #plate 29 (only from second plate of run1)
+ plates[28] = reflectX(plates[(ndataplates-1)*diffplate],plates[28])
+ plates[28] = reflectY(plates[(ndataplates-1)*diffplate],plates[28])
+ plates[28] = reflectTX(plates[(ndataplates-1)*diffplate],plates[28])
+ plates[28] = reflectTY(plates[(ndataplates-1)*diffplate],plates[28])
+
+ allplates = pd.DataFrame()
+
+ print("End of transformations, set PID and Z for all plates, then merge them into the final dataframe")
+ nactualplates = 27 #we miss plates 14 and 17
+ #PID go from 0 to 26
+ for iplate in range(nactualplates):
+  plates[iplate] = setPID(plates[iplate], nactualplates-1-iplate)
+  plates[iplate] = setZ(plates[iplate], brick.GetPlate(nactualplates-1-iplate).Z())
+  allplates = pd.concat([allplates,plates[iplate]])
+
+ allplates["Signal"] = 0
+
+ print("Dataframe ready, saving it to CSV")
+ allplates.to_csv("data_noise_DESY19_RUN6.csv",index=False)
 
