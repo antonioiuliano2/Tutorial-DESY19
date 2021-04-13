@@ -96,7 +96,12 @@ for shower in MCEvent:
        Piatto2.append(platenumber)       
     else: 
        plate = min(dfs.loc[(dfs['Lunghezza']==0) | (dfs['Lunghezza']==1)]['PID'])
-       Piatto = max(dfs.loc[(dfs['Lunghezza']>1) & (dfs['Lunghezza']<=10)]['PID']+1)
+       try: #in a rare event, only plates with 1 track and more than 10 tracks are present. Let us skip these events
+        Piatto = max(dfs.loc[(dfs['Lunghezza']>1) & (dfs['Lunghezza']<=10)]['PID']+1)
+       except ValueError:
+        print ("Event {} skipped: no suitable plate with Lunghezza between 2 and 10".format(shower))
+        continue
+
        dft = dfshower.query('PID>={}'.format(Piatto))
        dfy = dfshower.query('PID=={}'.format(Piatto))
        #piattonew = min(dft.loc[(dft['Lunghezza']==1)]['PID'])
