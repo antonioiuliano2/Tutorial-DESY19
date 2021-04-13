@@ -1,8 +1,8 @@
 executable            = PreReco.sh
 arguments             = $(ClusterID) $(ProcId)
-output                = output/Rect.$(ClusterId).$(ProcId).out
-error                 = error/Rect.$(ClusterId).$(ProcId).err
-log                   = log/Rect.$(ClusterId).log
+output                = output/PreReco.$(ClusterId).$(ProcId).out
+error                 = error/PreReco.$(ClusterId).$(ProcId).err
+log                   = log/PreReco.$(ClusterId).log
 getenv = False
 RequestCpus = 5
 notification = Never
