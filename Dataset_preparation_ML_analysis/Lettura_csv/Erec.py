@@ -44,7 +44,7 @@ for index, shower in enumerate(Ishower):
    
     #x0 = dft['Signal'].values
     x0 = size[index]
-    if (x0 >= options.minsize):
+    if (x0 >= int(options.minsize)):
      x = x0
  
      Erec = p1*x+p0
@@ -54,7 +54,7 @@ for index, shower in enumerate(Ishower):
      dfr['Erec']=Erec
     
 
-     sigma = (Erec-options.energy)/options.energy 
+     sigma = (Erec-float(options.energy))/float(options.energy)
      dfr['Sigma'] = sigma
      dfu = pd.concat([dfu, dfr])
 
