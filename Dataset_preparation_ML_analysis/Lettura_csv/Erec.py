@@ -8,20 +8,26 @@ from matplotlib import colors
 from copy import copy
 import ROOT as R
 import root_numpy as rp
+from argparse import ArgumentParser
 
 '''
 Estimate energy resolution, knowing the function,
 with a gaussian on Erec - Etrue / Etrue
 
+python Erec.py -i inputfile -n minsize -e expectedenergy
 '''
 
-dffinale_data = pd.read_csv('/home/utente/Simulations/Exercise_MariaChain/RUN5test/Random_Forest_withdata/Result_data.csv')
+parser = ArgumentParser()
+parser.add_argument("-i","--inputdataset",dest="inputcsvdataset",help="input dataset with Random Forest classification (e.g. Result_data.csv)",required=True)
+parser.add_argument("-n","--minsize",dest="minsize",help="minimum number of segments to accept a shower (e.g. 50)")
+parser.add_argument("-e","--energy",dest="energy",help="expected value of shower energy in GeV (e.g. 6)")
+options = parser.parse_args()
+
+dffinale_data = pd.read_csv(options.inputcsvdataset)
 #df = dffinale_data.query('Signal+BackSig>=50')
-minsize = 20
 
 df = dffinale_data.query("Y_pred_forest_data==1")
 
-Energy = 2
 sizedataset = df.groupby("Ishower").count()
 size = sizedataset["ID"].to_numpy()
 
@@ -38,18 +44,19 @@ for index, shower in enumerate(Ishower):
    
     #x0 = dft['Signal'].values
     x0 = size[index]
-    x = x0
+    if (x0 >= options.minsize):
+     x = x0
  
-    Erec = p1*x+p0
+     Erec = p1*x+p0
 
-    #Energy_ric.append(Erec)
-    dfr = dft.copy()
-    dfr['Erec']=Erec
+     #Energy_ric.append(Erec)
+     dfr = dft.copy()
+     dfr['Erec']=Erec
     
 
-    sigma = (Erec-Energy)/Energy 
-    dfr['Sigma'] = sigma
-    dfu = pd.concat([dfu, dfr])
+     sigma = (Erec-options.energy)/options.energy 
+     dfr['Sigma'] = sigma
+     dfu = pd.concat([dfu, dfr])
 
 
 c1 = R.TCanvas( 'c1', 'Histogram Drawing Options')
