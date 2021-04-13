@@ -22,7 +22,7 @@ def afterthetacut():
  '''Unisce i dataset ottenuti dopo il taglio in Theta e in IP/DeltaZ'''
  dftot = pd.DataFrame()
 
- MCEvent = [n for n in range(0, options.nshowers)]
+ MCEvent = [n for n in range(0, int(options.nshowers))]
  for shower in MCEvent:
   try:
     print(shower)
@@ -42,7 +42,7 @@ def afternewvariables():
  '''Unisce i dataset l'introduzione delle variabili dx, dy, dTX, dTY, da usare dopo Ricerca_new.py'''
  dftot = pd.DataFrame()
 
- MCEvent = [n for n in range(0, options.nshowers)]
+ MCEvent = [n for n in range(0, int(options.nshowers))]
  for shower in MCEvent:
   try: 
     print(shower)
