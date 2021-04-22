@@ -47,8 +47,6 @@ void set_default(TEnv &cenv){ //setting default parameters, if not presents from
  cenv.SetValue("FairShip2Fedra.minmomentum",0.1); //do not pass particles beyond this value, track ID would be -2
  cenv.SetValue("FairShip2Fedra.ngrains",70); // to set weight
  cenv.SetValue("FairShip2Fedra.angres",0.003);//used for smearing, if dosmearing = true
- cenv.SetValue("FairShip2Fedra.txoffset",0.); //additional offset for TX and TY angles
- cenv.SetValue("FairShip2Fedra.tyoffset",0.);
 
 }
 
@@ -79,8 +77,6 @@ void fromFairShip2Fedra(TString filename){
  const bool dosmearing = cenv.GetValue("FairShip2Fedra.dosmearing",1); //gaussian smearing or not
  const bool useresfunction = false; //use resfunction from operadata instead of constant value
 
- float txoffset = cenv.GetValue("FairShip2Fedra.txoffset",0.);
- float tyoffset = cenv.GetValue("FairShip2Fedra.tyoffset",0.);
  cout<<"Starting conversion with efficiency "<<emuefficiency<<" maxtheta "<<maxtheta<<" and min momentum "<<minmomentum<<endl;
  //if not performed digitization
  const bool donedigi = cenv.GetValue("FairShip2Fedra.donedigi",0);
@@ -159,8 +155,8 @@ void fromFairShip2Fedra(TString filename){
       xem = xem* 1E+4 + 62500;
       yem = yem* 1E+4 + 49500;         
      
-      tx = emupoint.GetPx()/emupoint.GetPz() + txoffset;
-      ty = emupoint.GetPy()/emupoint.GetPz() + tyoffset;  
+      tx = emupoint.GetPx()/emupoint.GetPz();
+      ty = emupoint.GetPy()/emupoint.GetPz();  
       tantheta = pow(pow(tx,2) + pow(ty,2),0.5);
 
      double charge,mass;        
