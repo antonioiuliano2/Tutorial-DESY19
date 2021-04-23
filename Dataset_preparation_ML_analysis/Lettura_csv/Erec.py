@@ -61,7 +61,7 @@ for index, shower in enumerate(Ishower):
 
 c1 = R.TCanvas( 'c1', 'Histogram Drawing Options')
 x = dfu['Sigma'].to_numpy()
-hx = R.TH1D('hres', '#DeltaE/E distribution; #DeltaE/E;Entries', 10, -1, 1)
+hx = R.TH1D('hres', '#DeltaE/E distribution; #DeltaE/E;Entries', 20, -1, 1)
 rp.fill_hist(hx,x)
 
 f1 = R.TF1('f1','gaus', -0.6, 0.6)
