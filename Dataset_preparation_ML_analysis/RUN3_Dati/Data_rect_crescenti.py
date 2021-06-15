@@ -96,17 +96,24 @@ def calcRect(ishower):
     dfcentrale = dfshower.query('PID== {}'.format(PID_max))
     xc = (dfcentrale['x'].values[0])
     yc = (dfcentrale['y'].values[0])
-    
+    zc = (dfcentrale['z'].values[0])
+    #we also need the angle to project the shower profile
+    txc = (dfcentrale['TX'].values[0])
+    tyc = (dfcentrale['TY'].values[0])    
 
     if PID_min>=0:
       for m in range(PID_min, PID_max+1):
         dfPID = dfshower.query('PID=={}'.format(m)) 
         dfPID_Next = dfshower.query('PID=={}'.format(m-1))
         
+        zPID = dfPID['z'].values[0] #z of this plate
+        
         xn = np.unique(dfPID['x'].values)
         zn = np.unique(dfPID['Z_Next'].values)
         yn = np.unique(dfPID['y'].values)
         
+        xc_proj = xc + txc * (zPID - zc)
+        yc_proj = yc + tyc * (zPID - zc)
 
         if len(xn)>0:
            xmedia = i*(PID_max-m)+y
@@ -117,7 +124,7 @@ def calcRect(ishower):
            ymedia_next= i*(PID_max+1-m)+y
 
 
-           dfxyPID_Next = dfPID_Next.query('{}-{}<x<{}+{} and {}-{}<y<{}+{}'.format(xc,xmedia_next/2,xc,xmedia_next/2, yc,ymedia_next/2,yc,ymedia_next/2))
+           dfxyPID_Next = dfPID_Next.query('{}-{}<x<{}+{} and {}-{}<y<{}+{}'.format(xc_proj,xmedia_next/2,xc_proj,xmedia_next/2, yc_proj,ymedia_next/2,yc_proj,ymedia_next/2))
           
            dfPID_successivo= pd.concat([dfPID_successivo, dfxyPID_Next])
            dfPID_successivo1 = dfPID_successivo.copy()
