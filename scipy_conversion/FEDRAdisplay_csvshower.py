@@ -4,14 +4,14 @@ import ROOT as r
 import fedrarootlogon
 
 EDAdisplay = True
-data = True
-prepath = "/home/utente/Lavoro/DE19_R3/RandomForest/"
+data = False
+prepath = "/eos/experiment/ship/data/DESY19TB/DE19_R3/RandomForest/"
 #prepath = "/home/utente/Simulations/dataset_Maria/"
 
 #importing csv file in a dataframe, taking segments classified as true
 
 
-datadf = pd.read_csv(prepath+"Dati_nuovo.csv")
+datadf = pd.read_csv(prepath+"Prediction.csv")
 #datadf = pd.read_csv(prepath+"Final_dataset_RUN3_3.csv")
 datadf = datadf[datadf["DeltaT"].isna()==False] 
 signaldf = datadf
@@ -19,7 +19,7 @@ signaldf = datadf
 if data:
  signaldf = datadf.query("Y_pred_forest_data==1")
 else:
- signaldf = datadf.query("Signal==1")
+ signaldf = datadf.query("Y_test==1")
 
 #requirement of minimum number of segments to acccept a shower
 minsegments = 50
